@@ -500,7 +500,7 @@ function App(){
       <header className="sticky top-0 z-30 bg-white border-b-[4px] border-zinc-900">
         <div className="max-w-[1160px] mx-auto px-3 md:px-6 h-[64px] flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 md:gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-[#58CC02] border-[3px] border-zinc-900 flex items-center justify-center shadow-[0_3px_0_#111] overflow-hidden p-1"><GiraMascot size={36} mood="happy"/></div>
+            <div className="w-10 h-10 rounded-2xl bg-[#58CC02] border-[3px] border-zinc-900 flex items-center justify-center shadow-[0_3px_0_#111] overflow-hidden p-0"><img src="assets/avatar.png" alt="Gabi" className="w-full h-full object-cover" loading="lazy"/></div>
             <div className="leading-none">
               <div className="game font-black text-[15px] md:text-[17px] tracking-tight">Girafês da Gabi</div>
               <div className="hidden md:block text-[10px] font-bold tracking-widest text-zinc-400 -mt-0.5">AVENTURA CNV • DUOLINGO EDITION</div>
@@ -530,6 +530,10 @@ function App(){
               <div className="bg-[#58CC02] px-6 py-3 flex items-center justify-between border-b-[3px] border-zinc-900">
                 <span className="game font-black text-white tracking-wide text-[13px]">🎁 UM PRESENTE DE VINICIUS PARA A GABI — 2026</span>
                 <span className="hidden md:inline-flex bg-white px-2 py-1 rounded-full text-[11px] font-black border-2 border-zinc-900">MADE WITH 💚</span>
+              </div>
+              <div className="px-6 pt-6">
+                <img src="assets/welcome.png" alt="Gabi, Vinicius e Girafês dando oi" className="w-full h-[220px] md:h-[300px] object-cover rounded-[20px] border-[3px] border-zinc-900 shadow-[0_4px_0_#111]" loading="lazy"/>
+                <div className="text-center text-[10px] font-black tracking-widest text-zinc-400 mt-2">👋 GABI, VINICIUS & GIRAFÊS — BEM-VINDA À AVENTURA!</div>
               </div>
               <div className="p-6 md:p-8">
                 <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -651,7 +655,10 @@ function App(){
           </div>
 
           <div className="bg-white rounded-[20px] border-[3px] border-zinc-900 shadow-[0_5px_0_#111] p-4">
-            <div className="flex items-center justify-between"><span className="game font-black text-[12px] flex items-center gap-1.5"><GiraMascot size={24} mood="happy"/> Diário</span><span className="game font-black text-[11px] bg-zinc-900 text-white px-2 py-0.5 rounded-full">{diario.length}</span></div>
+            <div className="flex items-center justify-between"><span className="game font-black text-[12px] flex items-center gap-1.5"><img src="assets/avatar.png" alt="Gabi" className="w-6 h-6 rounded-full border-2 border-zinc-900 object-cover" loading="lazy"/> Diário da Gabi</span><span className="game font-black text-[11px] bg-zinc-900 text-white px-2 py-0.5 rounded-full">{diario.length}</span></div>
+            <div className="mt-2 rounded-2xl overflow-hidden border-2 border-zinc-900 hidden md:block">
+              <img src="assets/diary.png" alt="Diário" className="w-full h-[100px] object-cover opacity-90" loading="lazy"/>
+            </div>
             {diario.length===0? <div className="text-[12px] font-bold text-zinc-500 mt-2">Nenhum Girafês ainda. Crie um na Triagem!</div>:
               <div className="space-y-2 mt-2 max-h-[220px] overflow-auto scrollbar-hide">
                 {diario.slice(0,3).map(d=>(
@@ -882,6 +889,12 @@ function App(){
                       <h3 className="game font-black text-[16px] md:text-[18px] leading-tight">{exercicio.prompt}</h3>
                       {exercicio.statement && <div className="text-[12px] font-bold text-zinc-600 mt-1">“{exercicio.statement}”</div>}
                       {exercicio.speaker && <div className="text-[13px] font-bold bg-[#E6F7FF] rounded-xl p-2 mt-2 border-2 border-zinc-900">“{exercicio.speaker}”</div>}
+                      {!resposta && exercicio.type!=='triagem' && (
+                        <div className="mt-3 flex items-center gap-3 p-2 rounded-2xl bg-[#FFFBF0] border-2 border-zinc-900">
+                          <img src="assets/thinking.png" alt="Gabi pensativa com girafinha" className="w-16 h-16 rounded-xl border-2 border-zinc-900 object-cover shrink-0" loading="lazy"/>
+                          <div className="text-[11px] font-bold leading-snug text-zinc-600">Dica da Gabi: <span className="text-[#9A5CFF]">pense onde sente no corpo</span> antes de responder. A girafinha tá te ajudando! 🦒</div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -969,7 +982,12 @@ function App(){
                   <div className={`mt-5 p-4 rounded-[20px] border-[3px] ${resposta==='correto'?'bg-[#E6FFE1] border-[#58CC02]':'bg-[#FFE8CC] border-[#FF9600]'}`}>
                     <div className="flex items-center gap-2">
                       <div className="shrink-0">{resposta==='correto'? <GiraMascot size={36} mood="celebrate"/> : <ChacMascot size={32} mood="sad"/>}</div>
-                      <div>
+                      <div className="flex-1">
+                        {resposta==='correto' && (
+                          <div className="mb-2 rounded-2xl overflow-hidden border-[3px] border-zinc-900">
+                            <img src="assets/success.png" alt="Gabi celebrando com girafinha" className="w-full h-[160px] object-cover" loading="lazy"/>
+                          </div>
+                        )}
                         <div className="game font-black text-[14px]">{resposta==='correto'?'BOA, GABI! +20 XP +5 💎':'QUASE LÁ!'}</div>
                         <div className="text-[13px] font-bold leading-relaxed">{exercicio.exp}</div>
                         <div className="mt-3 p-3 rounded-2xl bg-white border-[3px] border-zinc-900">
@@ -1104,6 +1122,10 @@ function App(){
                   <div className="game font-black text-[12px]">04 💌 PEDIDO CLARO?</div>
                   <input value={triagem.pedido} onChange={e=>setTriagem({...triagem, pedido:e.target.value})} placeholder="Ex: me incluir na decisão até 18h e checar comigo?" className="mt-2 w-full p-3 rounded-2xl border-2 border-zinc-900 text-[13px] font-bold"/>
                 </div>
+                <div className="rounded-[20px] border-[3px] border-zinc-900 overflow-hidden">
+                  <img src="assets/diary.png" alt="Gabi escrevendo diário com girafinha" className="w-full h-[200px] object-cover" loading="lazy"/>
+                  <div className="text-center bg-[#FFFBF0] py-2 border-t-[3px] border-zinc-900 game font-black text-[11px] tracking-widest text-zinc-500">📔 SEU DIÁRIO DE GIRAFÊS — ESCREVER REGULA!</div>
+                </div>
                 <div className="p-4 rounded-[20px] bg-zinc-900 text-white border-[3px] border-zinc-900">
                   <div className="game font-black text-[12px] text-[#FFD900] flex items-center gap-2"><GiraMascot size={28} mood="happy"/> PRÉVIA GIRAFÊS</div>
                   <div className="mt-2 bg-white/10 rounded-2xl p-4 border-2 border-white/20 text-[14px] font-bold leading-relaxed">
@@ -1121,9 +1143,12 @@ function App(){
           {view==='certificado' && (
             <div className="bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden text-center">
               <div className="h-2 w-full bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#FFD900]"></div>
+              <div className="px-0">
+                <img src="assets/certificate.png" alt="Gabi e Vinicius celebrando com certificado e girafinha medalhista" className="w-full h-[260px] md:h-[340px] object-cover border-b-[3px] border-zinc-900" loading="lazy"/>
+              </div>
               <div className="p-7 md:p-8">
-                <div className="mx-auto w-fit"><GiraMascot size={72} mood="celebrate"/></div>
-                <div className="game font-black text-[12px] tracking-widest text-zinc-500 mt-3">CERTIFICADO LENDÁRIO • 2026</div>
+                <div className="mx-auto w-fit hidden"><GiraMascot size={72} mood="celebrate"/></div>
+                <div className="game font-black text-[12px] tracking-widest text-zinc-500">CERTIFICADO LENDÁRIO • 2026</div>
                 <h2 className="game font-black text-[30px] leading-none mt-1">Dra. Gabi <span className="text-[#58CC02]">zerou!</span></h2>
                 <p className="text-[12px] font-black text-zinc-500 mt-1">{Object.keys(completos).length}/40 fases • {progressoGeral}% • {xp} XP</p>
                 <div className="mt-5 p-5 rounded-[20px] bg-[#FFFBF0] border-[3px] border-zinc-900 text-left">
