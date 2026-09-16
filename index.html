@@ -56,6 +56,50 @@ const FASES = [
   {id:7, titulo:"Modulação da Fúria", subtitulo:"Raiva e Força Protetora", code:"MUNDO 07", color:"#FF3B30", dark:"#CC2F26", emoji:"🔥", desc:"Raiva é bússola. Força que protege ≠ força que pune.", nerdTitle:"Citocinas vs Regulação", nerdDesc:"Raiva acolhida não inflama; punição iatrogênica sim."},
   {id:8, titulo:"Circuito da Gratidão", subtitulo:"Celebrar e Vincular", code:"MUNDO 08", color:"#FFD900", dark:"#E5B700", emoji:"⭐", desc:"Celebre com precisão e libere ocitocina em quem te cerca.", nerdTitle:"Reforço Ocitocinérgico", nerdDesc:"Gratidão específica = dopamina + confiança."},
 ];
+
+const AULAS = {
+  1: { conceito: "CNV não é técnica de frase bonita — é ginástica vagal. Chacal = sistema simpático em alerta (julgamento protege). Girafa = ventral vagal (coração regulado, escuta ampla). Antes de falar bonito, regule o corpo: 3 respirações, pés no chão.", exemplos: [
+    {antes:"Você sempre me atrasa, é irresponsável!", depois:"Quando vejo 90min sem aviso, sinto apreensão (preciso previsibilidade). Pode me avisar com 30min?", destrincha:["🔵 OBS: 90min sem aviso (fato filmável)","🟡 SENT: apreensão (corpo)","🟢 NEC: previsibilidade","🟣 PED: aviso 30min (ação+tempo)"]},
+    {antes:"Você não liga pra mim!", depois:"Quando passa 2 dias sem me responder, sinto solidão (preciso conexão). Pode me dizer quando consegue responder?", destrincha:["🔵 OBS: 2 dias sem resposta","🟡 SENT: solidão","🟢 NEC: conexão","🟣 PED: dizer quando"]},
+    {antes:"Calma, não é grave.", depois:"Parece assustada e precisando de segurança. Quer me contar o que mais te preocupa?", destrincha:["🔵 OBS: vejo tensão","🟡 SENT: assustada","🟢 NEC: segurança","🟣 PED: convite para falar"]}
+  ]},
+  2: { conceito: "Observação é câmera. Avaliação é legenda. Câmera: 'prontuário sem evolução 2 dias, leito 303'. Legenda: 'folgado'. A câmera une, a legenda separa.", exemplos: [
+    {antes:"Você é desorganizado!", depois:"Vejo 2 dias sem evolução no 303", destrincha:["🔵 FATO: 2 dias, leito 303","🔴 JUÍZO: desorganizado (rótulo)"]},
+    {antes:"Você me ignora!", depois:"Vejo mensagem visualizada há 24h sem resposta", destrincha:["🔵 FATO: 24h visualizada","🔴 JUÍZO: me ignora (leitura mental)"]},
+    {antes:"Ele é agressivo!", depois:"Vejo gritos e mão puxando acesso", destrincha:["🔵 FATO: gritos + puxando","🔴 JUÍZO: agressivo (diagnóstico)"]}
+  ]},
+  3: { conceito: "Sentimento autêntico mora no corpo. Pseudo-sentimento mora na cabeça e acusa. 'Sinto-me traída' = penso que você traiu. 'Sinto mágoa e medo' = sinto no peito.", exemplos: [
+    {antes:"Sinto que fui descartada", depois:"Sinto tristeza e insegurança", destrincha:["🔴 PSEUDO: fui descartada (ação do outro)","🟢 REAL: tristeza/insegurança (meu corpo)"]},
+    {antes:"Sinto-me manipulada", depois:"Sinto confusão e insegurança", destrincha:["🔴 PSEUDO: manipulada (intenção do outro)","🟢 REAL: confusão"]},
+    {antes:"Sinto-me atacada", depois:"Sinto medo e tensão", destrincha:["🔴 PSEUDO: atacada","🟢 REAL: medo/tensão"]}
+  ]},
+  4: { conceito: "Necessidade não é estratégia. 'Preciso que você me ligue' é estratégia. 'Preciso de conexão' é necessidade. Necessidades são universais: conexão, autonomia, segurança, descanso, propósito...", exemplos: [
+    {antes:"Preciso que você fique", depois:"Preciso de companhia e apoio", destrincha:["🔴 ESTRATÉGIA: que você fique (pessoa específica)","🟢 NEC: companhia/apoio (universal)"]},
+    {antes:"Sou obrigada pelo chefe", depois:"Escolho cobrir porque preciso de colaboração e segurança financeira", destrincha:["🔴 NEGAÇÃO: sou obrigada","🟢 ESCOLHA: preciso de colaboração"]},
+    {antes:"Preciso de férias", depois:"Preciso de descanso e leveza", destrincha:["🔴 ESTRATÉGIA: férias","🟢 NEC: descanso"]}
+  ]},
+  5: { conceito: "Pedido tem posologia: verbo observável + dose + checagem. 'Seja mais atencioso' não é dosável. 'Me incluir na reunião segunda 10h e checar se pode?' é.", exemplos: [
+    {antes:"Seja mais pontual!", depois:"Pode me avisar com 30min se atrasar e confirmar se consegue?", destrincha:["🔴 VAGO: seja pontual","🟢 DOSÁVEL: avisar 30min + confirmar"]},
+    {antes:"Me respeite!", depois:"Pode me deixar concluir 2min e depois comentar?", destrincha:["🔴 VAGO: respeite","🟢 DOSÁVEL: 2min + depois"]},
+    {antes:"Higienizem as mãos!", depois:"Podem higienizar agora antes do leito? Confirmam?", destrincha:["🔴 ORDEM: higienizem!","🟢 PEDIDO: agora + confirmam?"]}
+  ]},
+  6: { conceito: "Escuta desarmada = 80% da cura. Não é conselho, consolo, interrogatório ou história própria. É refletir sentimento + necessidade como espelho limpo. Silêncio + 'é isso?'", exemplos: [
+    {antes:"Você deveria fazer X", depois:"Parece culpada e com medo, precisando de confiança?", destrincha:["🔴 CONSELHO: deveria","🟢 ESPELHO: parece + precisando"]},
+    {antes:"Todo mundo passa por isso", depois:"Parece sozinha e precisando de acolhimento?", destrincha:["🔴 CONSOLO genérico","🟢 ACOLHIMENTO específico"]},
+    {antes:"Por que você sente isso?", depois:"Quer me contar mais sobre o que te pesa?", destrincha:["🔴 INTERROGATÓRIO","🟢 CONVITE"]}
+  ]},
+  7: { conceito: "Raiva é alarme de necessidade desatendida, não licença pra punir. Força protetora: contém com cuidado para proteger. Força punitiva: pune para fazer sofrer e 'aprender'.", exemplos: [
+    {antes:"Vai levar contenção pra aprender!", depois:"Vou conter seu braço com cuidado para proteger acesso, mantendo respeito. Conversamos quando se sentir seguro?", destrincha:["🔴 PUNITIVA: pra aprender (vingança)","🟢 PROTETORA: com cuidado + respeito"]},
+    {antes:"Você me fez ficar furiosa!", depois:"Sinto fúria porque preciso de justiça e respeito", destrincha:["🔴 NEGAÇÃO: você me fez","🟢 RESPONSABILIDADE: preciso"]},
+    {antes:"Se controle!", depois:"Parece com muita raiva e precisando de justiça?", destrincha:["🔴 JULGAMENTO","🟢 EMPATIA"]}
+  ]},
+  8: { conceito: "Gratidão específica é ocitocina em palavras: fato + sentimento + necessidade atendida + gesto. 'Obrigada' genérico não vicia. 'Obrigada por revisar meu artigo domingo, sinto gratidão porque preciso de parceria' vicia.", exemplos: [
+    {antes:"Valeu, foi ótimo!", depois:"Quando você revisou meu artigo domingo, sinto gratidão porque preciso de aprendizado e parceria. Seu cuidado fez diferença.", destrincha:["🔴 GENÉRICO: valeu","🟢 ESPECÍFICA: fato + sentimento + necessidade + impacto"]},
+    {antes:"Você é melhor que todos!", depois:"Quando vejo seu cuidado no leito 5, sinto admiração porque preciso de referência e colaboração.", destrincha:["🔴 COMPARAÇÃO","🟢 RECONHECIMENTO específico"]},
+    {antes:"Até que enfim acertaram", depois:"Quando estabilizamos juntos 40min, sinto orgulho porque preciso de cooperação e propósito.", destrincha:["🔴 IRONIA","🟢 CELEBRAÇÃO"]}
+  ]},
+};
+
 const SENTIMENTOS = {
   atendidas: ["grata","aliviada","encantada","confiante","inspirada","serena","energizada","aquecida","otimista","realizada"],
   naoAtendidas: ["apreensiva","frustrada","exausta","sobrecarregada","insegura","magoadada","ansiosa","irritada","triste","desanimada"]
@@ -103,6 +147,38 @@ const EXERCICIOS = [
   {id:"8-4",fase:8,type:"sinal_vs_juizo",prompt:"Autêntico?",statement:"Sinto-me valorizada e aquecida pelo seu apoio",isAuthentic:true,exp:"Sim — necessidade atendida."},
   {id:"8-5",fase:8,type:"escuta_clinica",prompt:"Gabi:",speaker:"Completei o protocolo, mas medo de esquecer.",options:[{label:"A — Minimizar",text:"Nunca vai esquecer, é inteligente.",correct:false},{label:"B — Celebração empática",text:"Parece orgulho com insegurança, precisando de confiança pra integrar? Repetição deliberada consolida.",correct:true},{label:"C — Cobrança",text:"Tem que praticar todo dia sem falhar.",correct:false}],exp:"Celebrar com precisão fecha circuito."},
 ];
+
+
+// Gerador infinito - combina pools para criar casos novos
+const POOLS = {
+  observacoes: ["vejo escala alterada sem aviso", "vejo mensagem lida há 2 dias sem retorno", "vejo colega falando alto na passagem de plantão", "vejo prontuário sem anotação há 1 dia", "vejo familiar chorando no corredor", "vejo residente interrompendo apresentação", "vejo paciente recusando medicação", "vejo equipe sem EPI no leito"],
+  sentimentos: ["frustrada","apreensiva","exausta","insegura","magoada","ansiosa","triste","irritada","sobrecarregada"],
+  necessidades: ["previsibilidade","conexão","respeito","colaboração","segurança","clareza","reconhecimento","apoio","descanso"],
+  pedidos: ["avisar com 30min de antecedência e confirmar?", "combinar horário fixo de registro?", "falar um de cada vez por 2min?", "me contar o que te preocupa agora?", "pausar 10min comigo para respirar?", "revisar escala amanhã 9h sem interrupção?"],
+  chacais: ["Você é um irresponsável!", "Você não se importa!", "Você é folgado!", "Você sempre faz isso!", "Você não serve pra isso!"],
+  bloqueios: ["Julgamento Moralizador","Comparação","Negação de Responsabilidade","Exigência Coercitiva"],
+};
+function gerarCasoInfinito(){
+  const o = POOLS.observacoes[Math.floor(Math.random()*POOLS.observacoes.length)];
+  const s = POOLS.sentimentos[Math.floor(Math.random()*POOLS.sentimentos.length)];
+  const n = POOLS.necessidades[Math.floor(Math.random()*POOLS.necessidades.length)];
+  const p = POOLS.pedidos[Math.floor(Math.random()*POOLS.pedidos.length)];
+  const tipos = ["triagem","sinal_vs_juizo","semiotica_bloqueios","escuta_clinica"];
+  const tipo = tipos[Math.floor(Math.random()*tipos.length)];
+  const id = "INF-" + Date.now().toString().slice(-5);
+  if(tipo==="triagem"){
+    return {id, fase: 99, type:"triagem", prompt:`Caso infinito: ${o}.`, contexto:"🎲 Caso gerado na hora", chacal: POOLS.chacais[Math.floor(Math.random()*POOLS.chacais.length)], girafa:`Quando ${o}, sinto ${s} porque preciso de ${n}. Você poderia ${p}`, exp:`OFNP: ${o} → sinto ${s} → preciso ${n} → ${p}`};
+  } else if(tipo==="sinal_vs_juizo"){
+    const pseudo = ["Sinto que fui ignorada","Sinto que me manipulam","Sinto-me atacada","Sinto que não me respeitam"];
+    const isPseudo = Math.random()>0.5;
+    return {id, fase:99, type:"sinal_vs_juizo", prompt:"Sinal ou juízo?", statement: isPseudo? pseudo[Math.floor(Math.random()*pseudo.length)] : `Sinto ${s} e apreensão`, isAuthentic: !isPseudo, alt:`Sinto ${s}`, exp: isPseudo? "Pseudo-sentimento: interpretação disfarçada." : "Sentimento autêntico: no corpo."};
+  } else if(tipo==="semiotica_bloqueios"){
+    const frases = ["Você tem que fazer agora, é sua obrigação!","Você é péssima nisso!","Sou obrigada por causa do sistema!","Você é melhor que todos!"];
+    return {id, fase:99, type:"semiotica_bloqueios", prompt:"Qual bloqueio?", statement: frases[Math.floor(Math.random()*frases.length)], options:[{label:"Julgamento Moralizador",correct:false},{label:"Exigência Coercitiva",correct:true},{label:"Negação de Responsabilidade",correct:false},{label:"Comparação",correct:false}], exp:"Identifique o ruído com precisão."};
+  } else {
+    return {id, fase:99, type:"escuta_clinica", prompt:"O que responder?", speaker:"Estou exausta e com medo de errar de novo.", options:[{label:"A — Conselho",text:"É só se organizar melhor.",correct:false},{label:"B — Empatia",text:`Parece ${s} e precisando de ${n}? Quer me contar mais?`,correct:true},{label:"C — Minimizar",text:"Todo mundo erra.",correct:false}], exp:"Escuta reflete sentimento + necessidade."};
+  }
+}
 
 // Mascotes SVG proprietários
 function GiraMascot({mood="happy", size=64}){
@@ -206,6 +282,9 @@ function App(){
   const [muted,setMuted]=useState(false);
   const [daily,setDaily]=useState({date: new Date().toISOString().slice(0,10), exToday:0, triageToday:0, chestOpened:false});
   const [mapOpen,setMapOpen]=useState(false);
+  const [aulaAberta,setAulaAberta]=useState(null);
+  const [casoInfinito,setCasoInfinito]=useState(null);
+  const [filtroAula,setFiltroAula]=useState(null);
   const audioRef = useRef(null);
 
   // audio helper
@@ -530,6 +609,46 @@ function App(){
           </div>
           {view==='map' && (
             <div className="space-y-4">
+              {/* AULA INTERATIVA - 60s */}
+              <div className="bg-[#FFF8E1] rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] overflow-hidden">
+                <button onClick={()=>setAulaAberta(aulaAberta?null:faseAtiva)} className="w-full p-4 flex items-center justify-between text-left">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#FFD900] border-2 border-zinc-900 flex items-center justify-center game font-black">📚</div>
+                    <div>
+                      <div className="game font-black text-[13px] leading-none">Aula 60s — {faseObj.titulo}</div>
+                      <div className="text-[11px] font-bold text-zinc-600">Toque para ver conceito + 3 exemplos guiados</div>
+                    </div>
+                  </div>
+                  <span className="w-8 h-8 rounded-full bg-zinc-900 text-white flex items-center justify-center game font-black text-[12px]">{aulaAberta===faseAtiva?'−':'+'}</span>
+                </button>
+                {aulaAberta===faseAtiva && AULAS[faseAtiva] && (
+                  <div className="px-4 pb-4 space-y-3">
+                    <div className="p-3 rounded-2xl bg-white border-2 border-zinc-900 text-[13px] font-bold leading-relaxed">💡 <b>Conceito:</b> {AULAS[faseAtiva].conceito}</div>
+                    {AULAS[faseAtiva].exemplos.map((ex,i)=>(
+                      <div key={i} className="rounded-2xl border-[3px] border-zinc-900 overflow-hidden">
+                        <div className="grid md:grid-cols-2">
+                          <div className="p-3 bg-[#FFECEE] border-b-2 md:border-b-0 md:border-r-2 border-zinc-900">
+                            <div className="text-[11px] font-black tracking-widest text-[#FF4B82]">🔴 ANTES — CHACAL</div>
+                            <div className="text-[13px] font-bold mt-1">“{ex.antes}”</div>
+                          </div>
+                          <div className="p-3 bg-[#E6FFE1]">
+                            <div className="text-[11px] font-black tracking-widest text-[#46A302]">🟢 DEPOIS — GIRAFA</div>
+                            <div className="text-[13px] font-bold mt-1">“{ex.depois}”</div>
+                          </div>
+                        </div>
+                        <div className="px-3 py-2 bg-zinc-900 text-white flex flex-wrap gap-1.5">
+                          {ex.destrincha.map((d,j)=>(<span key={j} className="text-[10px] font-black px-2 py-1 rounded-full bg-white/15 border border-white/20">{d}</span>))}
+                        </div>
+                      </div>
+                    ))}
+                    <div className="flex gap-2">
+                      <button onClick={()=>openFase(faseAtiva)} className="flex-1 py-2.5 rounded-full bg-[#58CC02] text-white game font-black border-b-[3px] border-[#46A302] press">Praticar agora →</button>
+                      <button onClick={()=>{setAulaAberta(null); setView('infinito'); setCasoInfinito(gerarCasoInfinito());}} className="px-4 py-2.5 rounded-full bg-white border-2 border-zinc-900 game font-black press">🎲 Caso infinito</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden">
                 <div className={`h-2 w-full`} style={{background: faseObj.color}}></div>
                 <div className="p-6 md:p-7">
@@ -701,11 +820,82 @@ function App(){
                       <div>
                         <div className="game font-black text-[14px]">{resposta==='correto'?'BOA, GABI! +20 XP +5 💎':'QUASE LÁ!'}</div>
                         <div className="text-[13px] font-bold leading-relaxed">{exercicio.exp}</div>
+                        <div className="mt-3 p-3 rounded-xl bg-white/70 border-2 border-zinc-900/10">
+                          <div className="text-[11px] font-black tracking-widest text-zinc-500">🔍 POR QUE FUNCIONA?</div>
+                          <div className="text-[12px] font-bold leading-relaxed mt-1">
+                            {exercicio.type==='triagem' && "Chacal julga caráter e ativa defesa. Girafa separa fato de história e revela necessidade — o outro consegue ouvir sem se defender."}
+                            {exercicio.type==='word_syntax' && "OFNP na ordem certa evita que o outro ouça crítica. Observar → sentir → precisar → pedir mantém o córtex pré-frontal ligado."}
+                            {exercicio.type==='semiotica_bloqueios' && "Esses 4 bloqueios são 'ruídos' que impedem conexão. Nomear o ruído já desarma 50% dele."}
+                            {exercicio.type==='sinal_vs_juizo' && "Nomear sentimento real regula amígdala (affect labeling). Pseudo-sentimento soa como acusação e escala conflito."}
+                            {exercicio.type==='escuta_clinica' && "Conselho rouba autonomia. Empatia devolve. Refletir sentimento+necessidade faz a pessoa se sentir vista — 80% da resolução."}
+                          </div>
+                          <div className="text-[11px] font-black tracking-widest text-zinc-500 mt-2">💡 EXEMPLO PRÁTICO EXTRA</div>
+                          <div className="text-[12px] font-bold leading-relaxed">Tente falar em voz alta a frase girafa 3x, mudando só o pedido. Seu sistema nervoso aprende pelo som da sua voz.</div>
+                        </div>
                       </div>
                     </div>
                     <button onClick={proximo} className={`mt-3 w-full py-3 rounded-full game font-black text-white border-b-[4px] press ${resposta==='correto'?'bg-[#58CC02] border-[#46A302]':'bg-zinc-900 border-black'}`}>
                       {exIdx<4?'PRÓXIMA →':'CONCLUIR MUNDO →'}
                     </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {view==='infinito' && (
+            <div className="bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden">
+              <div className="bg-[#9A5CFF] p-5 border-b-[3px] border-zinc-900 text-white flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center text-[18px]">🎲</div>
+                  <div><div className="game font-black text-[13px] tracking-widest">MODO INFINITO</div><h2 className="game font-black text-[20px] leading-none">Prática ilimitada</h2></div>
+                </div>
+                <button onClick={()=>setCasoInfinito(gerarCasoInfinito())} className="px-4 py-2 rounded-full bg-white text-[#9A5CFF] game font-black border-2 border-zinc-900 press">↻ NOVO CASO</button>
+              </div>
+              <div className="p-5">
+                {!casoInfinito ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 rounded-2xl bg-[#F4F0FF] border-2 border-zinc-900 flex items-center justify-center text-[28px] mx-auto">🎲</div>
+                    <div className="game font-black text-[16px] mt-3">Gere casos novos para sempre</div>
+                    <div className="text-[13px] font-bold text-zinc-500 mt-1">Cada caso é inédito, com feedback educativo completo. Ideal para manter streak.</div>
+                    <button onClick={()=>setCasoInfinito(gerarCasoInfinito())} className="mt-4 px-6 py-3 rounded-full bg-[#9A5CFF] text-white game font-black border-b-[4px] border-[#7A3DCC] press">🎲 GERAR PRIMEIRO CASO</button>
+                  </div>
+                ) : (
+                  <div className={`bg-white rounded-[24px] border-[3px] border-zinc-900 p-5 ${shake?'animate-shake':''}`}>
+                    <div className="flex items-center gap-2 mb-2"><span className="game font-black text-[11px] px-2 py-1 rounded-full bg-zinc-900 text-white">{casoInfinito.id}</span><span className="game font-black text-[11px] text-zinc-500">{casoInfinito.type}</span></div>
+                    <h3 className="game font-black text-[16px]">{casoInfinito.prompt}</h3>
+                    {casoInfinito.statement && <div className="mt-2 p-3 rounded-xl bg-zinc-50 border-2 border-zinc-900 text-[13px] font-bold">“{casoInfinito.statement}”</div>}
+                    {casoInfinito.speaker && <div className="mt-2 p-3 rounded-xl bg-[#E6F7FF] border-2 border-zinc-900 text-[13px] font-bold">“{casoInfinito.speaker}”</div>}
+                    {casoInfinito.type==='triagem' && (
+                      <div className="grid md:grid-cols-2 gap-2 mt-3">
+                        <button onClick={()=>{const ok=false; setResposta('errado'); setShowExp(true); soundWrong(); setShake(true); setTimeout(()=>setShake(false),500);}} className="p-3 rounded-2xl bg-[#FFECEE] border-[3px] border-zinc-900 text-left press"><div className="game font-black text-[11px] text-[#FF4B82]">🐺 CHACAL</div><div className="text-[13px] font-bold mt-1">“{casoInfinito.chacal}”</div></button>
+                        <button onClick={()=>{setResposta('correto'); setShowExp(true); soundCorrect(); spawnFlying(); setShowConfetti(true); setTimeout(()=>setShowConfetti(false),900); setXp(x=>x+15); setGems(g=>g+3);}} className="p-3 rounded-2xl bg-[#E6FFE1] border-[3px] border-zinc-900 text-left press"><div className="game font-black text-[11px] text-[#46A302]">🦒 GIRAFA</div><div className="text-[13px] font-bold mt-1">“{casoInfinito.girafa}”</div></button>
+                      </div>
+                    )}
+                    {casoInfinito.type==='sinal_vs_juizo' && (
+                      <div className="grid md:grid-cols-2 gap-2 mt-3">
+                        <button onClick={()=>{const ok=( 'autentico'=== (casoInfinito.isAuthentic?'autentico':'pseudo')); setResposta(ok?'correto':'errado'); setShowExp(true); ok?soundCorrect():soundWrong();}} className="p-3 rounded-2xl bg-[#E6FFE1] border-[3px] border-zinc-900 press"><div className="game font-black text-[11px]">💚 SINAL</div></button>
+                        <button onClick={()=>{const ok=( 'pseudo'=== (casoInfinito.isAuthentic?'autentico':'pseudo')); setResposta(ok?'correto':'errado'); setShowExp(true); ok?soundCorrect():soundWrong();}} className="p-3 rounded-2xl bg-[#FFECEE] border-[3px] border-zinc-900 press"><div className="game font-black text-[11px]">💔 PSEUDO</div></button>
+                      </div>
+                    )}
+                    {casoInfinito.type==='semiotica_bloqueios' && (
+                      <div className="grid gap-2 mt-3">
+                        {casoInfinito.options.map(o=>(<button key={o.label} onClick={()=>{const ok=o.correct; setResposta(ok?'correto':'errado'); setShowExp(true); ok?soundCorrect():soundWrong();}} className="p-3 rounded-2xl bg-white border-[3px] border-zinc-900 text-left press"><div className="game font-black text-[13px]">{o.label}</div></button>))}
+                      </div>
+                    )}
+                    {casoInfinito.type==='escuta_clinica' && (
+                      <div className="space-y-2 mt-3">
+                        {casoInfinito.options.map(o=>(<button key={o.label} onClick={()=>{const ok=o.correct; setResposta(ok?'correto':'errado'); setShowExp(true); ok?soundCorrect():soundWrong();}} className="w-full text-left p-3 rounded-2xl border-[3px] border-zinc-900 press bg-white"><div className="text-[11px] font-black">{o.label}</div><div className="text-[13px] font-bold">“{o.text}”</div></button>))}
+                      </div>
+                    )}
+                    {showExp && (
+                      <div className={`mt-4 p-3 rounded-2xl border-[3px] ${resposta==='correto'?'bg-[#E6FFE1] border-[#58CC02]':'bg-[#FFE8CC] border-[#FF9600]'}`}>
+                        <div className="game font-black text-[13px]">{resposta==='correto'?'✅ BOA! +15 XP':'⚠️ Quase!'}</div>
+                        <div className="text-[12px] font-bold mt-1">{casoInfinito.exp}</div>
+                        <div className="mt-2 p-2 rounded-xl bg-white/70 border border-zinc-900/10 text-[11px] font-bold">💡 Dica: fale em voz alta 2x. Seu cérebro aprende pelo som.</div>
+                        <button onClick={()=>{setCasoInfinito(gerarCasoInfinito()); setResposta(null); setShowExp(false);}} className="mt-3 w-full py-2.5 rounded-full bg-zinc-900 text-white game font-black press">🎲 PRÓXIMO CASO INFINITO →</button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
