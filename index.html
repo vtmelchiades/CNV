@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Girafês da Gabi — Aventura CNV</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@700;800;900&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config={ theme:{ extend:{ fontFamily:{ game:['Nunito','Fredoka','sans-serif'], sans:['Plus Jakarta Sans','sans-serif'] } } } }
+</script>
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*{ -webkit-font-smoothing:antialiased }
+body{ font-family:"Plus Jakarta Sans",system-ui,sans-serif; background:#FFFBF0; }
+.game{ font-family:"Nunito",sans-serif; letter-spacing:-0.02em }
+.press:active{ transform:translateY(2px) }
+.press{ transition:transform 80ms ease, box-shadow 80ms ease, filter 120ms ease }
+.shadow-3d-green{ box-shadow:0 5px 0 #46A302 }
+.shadow-3d-blue{ box-shadow:0 5px 0 #0A91D4 }
+.shadow-3d-yellow{ box-shadow:0 5px 0 #E5B700 }
+.shadow-3d-zinc{ box-shadow:0 5px 0 #D4D4D8 }
+.shadow-3d-purple{ box-shadow:0 5px 0 #7A3DCC }
+.shadow-3d-pink{ box-shadow:0 5px 0 #CC2F5A }
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.float{ animation:float 2.8s ease-in-out infinite }
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+.animate-shake{ animation:shake 420ms ease }
+@keyframes pop{0%{transform:scale(0.86)}50%{transform:scale(1.06)}100%{transform:scale(1)}}
+.animate-pop{ animation:pop 320ms ease }
+@keyframes confetti{0%{transform:translateY(-10px) rotate(0deg); opacity:1}100%{transform:translateY(160px) rotate(720deg); opacity:0}}
+@keyframes flyUp{0%{transform:translate(0,0) scale(1); opacity:1}100%{transform:translate(var(--tx), var(--ty)) scale(0.4); opacity:0}}
+.fly-gem{ animation:flyUp 800ms cubic-bezier(0.2,0.8,0.4,1) forwards }
+@keyframes chestGlow{0%,100%{box-shadow:0 0 0 0 rgba(255,217,0,0.5)}50%{box-shadow:0 0 0 14px rgba(255,217,0,0)}}
+.chest-ready{ animation:chestGlow 1.2s ease infinite }
+@keyframes wiggle{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}
+.wiggle{ animation:wiggle 400ms ease }
+.pattern-dots{ background-image:radial-gradient(#FFE8A3 2px, transparent 2.5px); background-size:22px 22px }
+.scrollbar-hide::-webkit-scrollbar{display:none}
+.scrollbar-hide{scrollbar-width:none}
+</style>
+</head>
+<body class="text-zinc-800">
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useMemo,useRef} = React;
+const FASES = [
+  {id:1, titulo:"O Coração da Escuta", subtitulo:"Presença & Intenção", code:"MUNDO 01", color:"#58CC02", dark:"#46A302", emoji:"💚", desc:"O primeiro poder da Gabi: sair do modo Chacal reativo e ligar o modo Girafa regulada.", nerdTitle:"Modulação Vagal vs Sequestro Amigdalar", nerdDesc:"Treino de freio vagal ventral. Simpático = chacal (coração acelerado). Parassimpático = girafa (escuta ampla)."},
+  {id:2, titulo:"O Olhar Semiótico", subtitulo:"Observação sem Avaliação", code:"MUNDO 02", color:"#1CB0F6", dark:"#0A91D4", emoji:"🔍", desc:"Separe a câmera do comentário. Veja o fato nu, sem legenda.", nerdTitle:"Anamnese sem viés", nerdDesc:"Descrever sem rotular — como semiologia pura."},
+  {id:3, titulo:"Sinais Vitais do Afeto", subtitulo:"Alfabetização Emocional", code:"MUNDO 03", color:"#FF9600", dark:"#D67E00", emoji:"💛", desc:"Sentimentos são sinais vitais. Aprenda a ler sua termometria interna.", nerdTitle:"Termometria Interoceptiva", nerdDesc:"Nomear o afeto com precisão regula a amígdala."},
+  {id:4, titulo:"A Fisiologia das Necessidades", subtitulo:"Inventário Vital", code:"MUNDO 04", color:"#9A5CFF", dark:"#7A3DCC", emoji:"🌱", desc:"Por trás de toda emoção vive uma necessidade universal tentando respirar.", nerdTitle:"Homeostase Psíquica", nerdDesc:"7 eixos de Rosenberg = necessidades homeostáticas."},
+  {id:5, titulo:"A Posologia do Pedido", subtitulo:"Clareza de Ação", code:"MUNDO 05", color:"#FF4B82", dark:"#D93A68", emoji:"💌", desc:"Transforme exigência em pedido claro, dosável e cheio de escolha.", nerdTitle:"Prescrição de Ação Positiva", nerdDesc:"Pedido com posologia: verbo + dose + verificação."},
+  {id:6, titulo:"Escuta Desarmada", subtitulo:"Empatia Radical", code:"MUNDO 06", color:"#00D1A0", dark:"#00A87F", emoji:"👂", desc:"80% da cura acontece quando você só escuta — sem consertar.", nerdTitle:"Ausculta Empática", nerdDesc:"Presença sem conselho = co-regulação."},
+  {id:7, titulo:"Modulação da Fúria", subtitulo:"Raiva e Força Protetora", code:"MUNDO 07", color:"#FF3B30", dark:"#CC2F26", emoji:"🔥", desc:"Raiva é bússola. Força que protege ≠ força que pune.", nerdTitle:"Citocinas vs Regulação", nerdDesc:"Raiva acolhida não inflama; punição iatrogênica sim."},
+  {id:8, titulo:"Circuito da Gratidão", subtitulo:"Celebrar e Vincular", code:"MUNDO 08", color:"#FFD900", dark:"#E5B700", emoji:"⭐", desc:"Celebre com precisão e libere ocitocina em quem te cerca.", nerdTitle:"Reforço Ocitocinérgico", nerdDesc:"Gratidão específica = dopamina + confiança."},
+];
+const SENTIMENTOS = {
+  atendidas: ["grata","aliviada","encantada","confiante","inspirada","serena","energizada","aquecida","otimista","realizada"],
+  naoAtendidas: ["apreensiva","frustrada","exausta","sobrecarregada","insegura","magoadada","ansiosa","irritada","triste","desanimada"]
+};
+const NECESSIDADES = ["conexão","compreensão","autonomia","confiança","previsibilidade","cuidado","reconhecimento","clareza","pertencimento","descanso","propósito","segurança","colaboração","respeito","apoio"];
+const EXERCICIOS = [
+  {id:"1-1",fase:1,type:"triagem",prompt:"Plantão: colega atrasa 90 min. Você está exausta.",contexto:"⚡ Sinal Entrópico detectado",chacal:"Você é irresponsável! Sempre me deixa na mão!",girafa:"Quando vejo que a rendição atrasou 90 min sem aviso, sinto apreensão e exaustão, porque preciso de previsibilidade e parceria. Você poderia me avisar com 30 min de antecedência?",exp:"Girafa traduz gatilho em OFNP completa: fato + sentimento + necessidade + pedido. Chacal julga caráter."},
+  {id:"1-2",fase:1,type:"word_syntax",prompt:"Monte a frase Girafa na ordem certa:",blocksCorrect:["Quando percebo que sou interrompida na apresentação,","sinto frustração e insegurança,","porque preciso de respeito e espaço,","você deixaria eu concluir e depois comentar?"],exp:"Ordem OFNP: 01 Observação → 02 Sentimento → 03 Necessidade → 04 Pedido."},
+  {id:"1-3",fase:1,type:"semiotica_bloqueios",prompt:"Qual o ruído aqui?",statement:"Você é uma péssima colega, só pensa em si.",options:[{label:"Julgamento Moralizador",correct:true,desc:"Rótulo de caráter"},{label:"Comparação",correct:false},{label:"Negação de Responsabilidade",correct:false},{label:"Exigência",correct:false}],exp:"Julga o outro em vez de revelar o que vive em você."},
+  {id:"1-4",fase:1,type:"sinal_vs_juizo",prompt:"É sinal vital ou juízo disfarçado?",statement:"Sinto que fui descartada pela equipe",isAuthentic:false,alt:"Sinto tristeza e insegurança",exp:"'Fui descartada' é leitura mental. Sentimento puro é tristeza/insegurança."},
+  {id:"1-5",fase:1,type:"escuta_clinica",prompt:"Amiga diz:",speaker:"Briguei com minha mãe, sou horrível, não sirvo pra nada.",options:[{label:"A — Conselho",text:"Você deveria pedir desculpas agora.",correct:false},{label:"B — Girafa: Empatia",text:"Parece que você tá culpada e angustiada, precisando de acolhimento e de se sentir uma boa filha?",correct:true},{label:"C — Minimizar",text:"Relaxa, toda mãe briga.",correct:false}],exp:"Escuta não conserta. Reflete sentimento + necessidade."},
+  {id:"2-1",fase:2,type:"triagem",prompt:"Prontuário sem evolução por 2 dias.",chacal:"Você é desorganizado e folgado!",girafa:"Quando vejo 2 dias sem evolução no leito 303, sinto preocupação porque preciso de continuidade. Combinamos horário fixo?",exp:"Fato verificável vs rótulo 'folgado'."},
+  {id:"2-2",fase:2,type:"word_syntax",prompt:"Câmera vs legenda — ordene:",blocksCorrect:["Quando vejo mensagens visualizadas sem resposta por 24h,","sinto ansiedade,","pois preciso de clareza e colaboração,","você consegue me responder até 18h hoje?"],exp:"Sem 'você me ignora'."},
+  {id:"2-3",fase:2,type:"semiotica_bloqueios",prompt:"Que bloqueio é esse?",statement:"Se eu fosse boa médica, não teria errado a dose.",options:[{label:"Auto-julgamento / Comparação",correct:true},{label:"Negação",correct:false},{label:"Exigência",correct:false},{label:"Julgamento do outro",correct:false}],exp:"Comparação com 'eu ideal' gera vergonha, não aprendizado."},
+  {id:"2-4",fase:2,type:"sinal_vs_juizo",prompt:"Sentimento autêntico?",statement:"Sinto-me ignorada na reunião",isAuthentic:false,alt:"Sinto frustração e solidão",exp:"'Ignorada' é ação do outro, não sentimento."},
+  {id:"2-5",fase:2,type:"escuta_clinica",prompt:"Paciente diz:",speaker:"Doutora, tenho medo desse exame, não dormi.",options:[{label:"A — Interrogar",text:"Por que tá com medo? Já fez antes?",correct:false},{label:"B — Empatia",text:"Parece bem ansiosa, precisando de segurança e informação clara?",correct:true},{label:"C — Tranquilizar vazio",text:"Vai dar tudo certo.",correct:false}],exp:"Nomear medo + segurança regula mais."},
+  {id:"3-1",fase:3,type:"triagem",prompt:"Parceiro atrasa pela 3ª vez.",chacal:"Você não me ama o suficiente!",girafa:"Quando percebo o 3º atraso sem aviso, sinto tristeza e irritação porque preciso de consideração. Como organizamos horários?",exp:"Troca desamor por necessidade."},
+  {id:"3-2",fase:3,type:"word_syntax",prompt:"Termômetro afetivo:",blocksCorrect:["Quando ouço que meu artigo foi criticado,","sinto vulnerabilidade e desânimo,","porque valorizo reconhecimento e pertencimento,","você me diz um ponto forte que viu?"],exp:"Vulnerabilidade + pertencimento."},
+  {id:"3-3",fase:3,type:"semiotica_bloqueios",prompt:"Ruído?",statement:"Você tem que me responder agora, é sua obrigação.",options:[{label:"Exigência Coercitiva",correct:true},{label:"Julgamento",correct:false},{label:"Comparação",correct:false},{label:"Negação",correct:false}],exp:"'Tem que' é coerção; pedido preserva escolha."},
+  {id:"3-4",fase:3,type:"sinal_vs_juizo",prompt:"Avalie:",statement:"Sinto que você não me respeita",isAuthentic:false,alt:"Sinto mágoa e raiva",exp:"Respeito é interpretação, não sentimento."},
+  {id:"3-5",fase:3,type:"escuta_clinica",prompt:"Residente:",speaker:"Errei a prescrição, sou um lixo.",options:[{label:"A — Corrigir",text:"É só conferir a dose depois.",correct:false},{label:"B — Empatia",text:"Parece culpada e com medo, precisando de confiança e apoio pra aprender?",correct:true},{label:"C — Comparar",text:"Todo mundo erra, eu já errei pior.",correct:false}],exp:"Validar culpa antes da técnica."},
+  {id:"4-1",fase:4,type:"triagem",prompt:"Pede ajuda e ouve 'se vira'.",chacal:"Ninguém liga pra mim!",girafa:"Quando ouço 'se vira' após pedir ajuda, sinto solidão e frustração porque preciso de apoio. Como você poderia me ajudar hoje?",exp:"De vítima para protagonista."},
+  {id:"4-2",fase:4,type:"word_syntax",prompt:"Homeostase:",blocksCorrect:["Quando passo o dia sem pausar pra almoçar,","sinto irritação e esgotamento,","porque preciso de cuidado e descanso,","você me cobre 20 min pra eu comer?"],exp:"Necessidade física sem culpa."},
+  {id:"4-3",fase:4,type:"semiotica_bloqueios",prompt:"Identifique:",statement:"Sou obrigada a aceitar plantão por causa da chefia.",options:[{label:"Negação de Responsabilidade",correct:true},{label:"Julgamento",correct:false},{label:"Exigência",correct:false},{label:"Comparação",correct:false}],exp:"'Obrigada pela chefia' apaga escolha."},
+  {id:"4-4",fase:4,type:"sinal_vs_juizo",prompt:"Autêntico?",statement:"Sinto-me pressionada e ansiosa antes da prova",isAuthentic:true,exp:"Sim — estados internos sem acusar."},
+  {id:"4-5",fase:4,type:"escuta_clinica",prompt:"Mãe:",speaker:"Meu filho não melhora, não durmo mais.",options:[{label:"A — Conselho",text:"Tente chá pra dormir.",correct:false},{label:"B — Empatia",text:"Parece exausta e assustada, precisando de apoio e esperança?",correct:true},{label:"C — Investigar",text:"Há quantos dias tá assim?",correct:false}],exp:"Validar exaustão primeiro."},
+  {id:"5-1",fase:5,type:"triagem",prompt:"Equipe não higieniza mãos.",chacal:"Vocês são porcos!",girafa:"Quando vejo que a higiene não foi feita ao entrar no leito, sinto apreensão porque preciso de segurança. Poderiam higienizar agora?",exp:"Pedido observável + momento."},
+  {id:"5-2",fase:5,type:"word_syntax",prompt:"Pedido dosável:",blocksCorrect:["Quando decisões são tomadas sem me consultar,","sinto frustração,","porque preciso de participação e respeito,","me inclui na reunião de segunda 10h?"],exp:"Positivo, específico, temporal."},
+  {id:"5-3",fase:5,type:"semiotica_bloqueios",prompt:"Ruído:",statement:"Você deveria ser mais grata pelo que faço.",options:[{label:"Julgamento + Exigência",correct:true},{label:"Comparação",correct:false},{label:"Negação",correct:false},{label:"Observação",correct:false}],exp:"'Deveria' impõe moral."},
+  {id:"5-4",fase:5,type:"sinal_vs_juizo",prompt:"Avalie:",statement:"Sinto que você me manipula",isAuthentic:false,alt:"Sinto insegurança e confusão",exp:"Manipulação é hipótese."},
+  {id:"5-5",fase:5,type:"escuta_clinica",prompt:"Parceiro:",speaker:"Você prefere o hospital a mim.",options:[{label:"A — Defender",text:"Claro que não, exagero.",correct:false},{label:"B — Empatia",text:"Parece sozinho e com saudade, precisando de conexão? Quer me contar?",correct:true},{label:"C — Prometer demais",text:"Vou pedir demissão.",correct:false}],exp:"Sem defesa, abre negociação."},
+  {id:"6-1",fase:6,type:"triagem",prompt:"Amiga chora por término.",chacal:"Supera, tem gente pior!",girafa:"Te vejo chorando com dor. Imagino tristeza grande. Quer acolhimento? Tô aqui sem pressa.",exp:"Troca consolo apressado por presença."},
+  {id:"6-2",fase:6,type:"word_syntax",prompt:"Escuta reflexiva:",blocksCorrect:["Quando diz que tá sobrecarregada com plantões,","imagino exaustão e culpa,","porque precisa de equilíbrio e cuidado,","é isso que tá vivo agora?"],exp:"Checa compreensão."},
+  {id:"6-3",fase:6,type:"semiotica_bloqueios",prompt:"Bloqueio:",statement:"Para de chorar e seja forte.",options:[{label:"Minimização / Negação",correct:true},{label:"Comparação",correct:false},{label:"Negação de Responsabilidade",correct:false},{label:"Observação",correct:false}],exp:"Manda reprimir choro."},
+  {id:"6-4",fase:6,type:"sinal_vs_juizo",prompt:"Autêntico?",statement:"Sinto esperança e alívio após conversar",isAuthentic:true,exp:"Sim — estados internos."},
+  {id:"6-5",fase:6,type:"escuta_clinica",prompt:"Interno:",speaker:"Família não entende meu cansaço, vou desistir.",options:[{label:"A — Palestra",text:"Medicina é sacerdócio.",correct:false},{label:"B — Empatia",text:"Parece desvalorizado e exausto, precisando de compreensão e descanso?",correct:true},{label:"C — Interrogar",text:"Quantas horas dormiu?",correct:false}],exp:"Validar desvalorização."},
+  {id:"7-1",fase:7,type:"triagem",prompt:"Paciente tenta arrancar acesso e grita.",chacal:"Seu agressivo! Vai levar contenção pra aprender!",girafa:"Vejo risco de arrancar acesso, sinto medo porque preciso de segurança. Vou conter com cuidado pra proteger, com respeito. Conversamos quando se sentir seguro?",exp:"Força protetora vs punitiva."},
+  {id:"7-2",fase:7,type:"word_syntax",prompt:"Regule a fúria:",blocksCorrect:["Quando meu limite foi desrespeitado na escala,","sinto raiva intensa,","porque preciso de justiça e respeito,","revisa comigo amanhã 9h sem interrupção?"],exp:"Raiva -> pedido."},
+  {id:"7-3",fase:7,type:"semiotica_bloqueios",prompt:"Qual?",statement:"Você me fez ficar furiosa, culpa sua!",options:[{label:"Negação de Responsabilidade",correct:true},{label:"Julgamento",correct:false},{label:"Comparação",correct:false},{label:"Observação",correct:false}],exp:"Sentimentos nascem de necessidades, não são 'feitos'."},
+  {id:"7-4",fase:7,type:"sinal_vs_juizo",prompt:"Avalie:",statement:"Sinto-me atacada quando levanta a voz",isAuthentic:false,alt:"Sinto medo e tensão",exp:"'Atacada' é interpretação."},
+  {id:"7-5",fase:7,type:"escuta_clinica",prompt:"Colega explode:",speaker:"Não aguento cobrir furo de quem não se compromete!",options:[{label:"A — Julgar",text:"Se controle, explosiva.",correct:false},{label:"B — Empatia pra raiva",text:"Parece com muita raiva e exaustão, precisando de justiça e colaboração?",correct:true},{label:"C — Conselho",text:"Fala com chefia.",correct:false}],exp:"Raiva acolhida desinflama."},
+  {id:"8-1",fase:8,type:"triagem",prompt:"Equipe salvou paciente grave.",chacal:"Até que enfim fizeram algo certo.",girafa:"Quando estabilizamos juntos após 40 min de reanimação, sinto gratidão e orgulho porque preciso de cooperação e propósito. Obrigada por cada compressão!",exp:"Gratidão específica: fato + sentimento + necessidade + gesto."},
+  {id:"8-2",fase:8,type:"word_syntax",prompt:"Celebração:",blocksCorrect:["Quando você revisou meu artigo com cuidado,","sinto gratidão e inspiração,","porque preciso de aprendizado e parceria,","obrigada por dedicar seu domingo — foi precioso."],exp:"Nomeia impacto concreto."},
+  {id:"8-3",fase:8,type:"semiotica_bloqueios",prompt:"Sutil:",statement:"Você é melhor que todos os residentes.",options:[{label:"Comparação (mesmo elogiando)",correct:true},{label:"Observação",correct:false},{label:"Pedido",correct:false},{label:"Sentimento",correct:false}],exp:"Até elogio comparativo hierarquiza."},
+  {id:"8-4",fase:8,type:"sinal_vs_juizo",prompt:"Autêntico?",statement:"Sinto-me valorizada e aquecida pelo seu apoio",isAuthentic:true,exp:"Sim — necessidade atendida."},
+  {id:"8-5",fase:8,type:"escuta_clinica",prompt:"Gabi:",speaker:"Completei o protocolo, mas medo de esquecer.",options:[{label:"A — Minimizar",text:"Nunca vai esquecer, é inteligente.",correct:false},{label:"B — Celebração empática",text:"Parece orgulho com insegurança, precisando de confiança pra integrar? Repetição deliberada consolida.",correct:true},{label:"C — Cobrança",text:"Tem que praticar todo dia sem falhar.",correct:false}],exp:"Celebrar com precisão fecha circuito."},
+];
+
+// Mascotes SVG proprietários
+function GiraMascot({mood="happy", size=64}){
+  const isHappy = mood==="happy";
+  const isCelebrate = mood==="celebrate";
+  return (
+    <svg width={size} height={size} viewBox="0 0 80 80" className={isCelebrate?'float':''}>
+      <ellipse cx="40" cy="72" rx="18" ry="6" fill="#000" opacity="0.08"/>
+      {/* corpo */}
+      <rect x="28" y="46" width="24" height="18" rx="8" fill="#FFD93D" stroke="#111" strokeWidth="2.5"/>
+      <circle cx="34" cy="55" r="2.5" fill="#8B5A00" opacity="0.9"/><circle cx="46" cy="58" r="2" fill="#8B5A00" opacity="0.9"/>
+      {/* estetoscópio */}
+      <path d="M32 62 C 26 66, 22 60, 30 56" stroke="#4B5563" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+      <circle cx="30" cy="56" r="3.5" fill="#111" stroke="white" strokeWidth="1.2"/><circle cx="30" cy="56" r="1.2" fill="#9CA3AF"/>
+      {/* pescoço */}
+      <rect x="34" y="30" width="12" height="18" rx="6" fill="#FFD93D" stroke="#111" strokeWidth="2.5"/>
+      <circle cx="40" cy="38" r="2" fill="#8B5A00"/>
+      {/* cabeça */}
+      <rect x="18" y="10" width="44" height="30" rx="14" fill="#FFD93D" stroke="#111" strokeWidth="2.5"/>
+      {/* manchas */}
+      <circle cx="28" cy="22" r="4" fill="#FF9F1C" stroke="#111" strokeWidth="1.2"/><circle cx="52" cy="18" r="3" fill="#FF9F1C" stroke="#111" strokeWidth="1.2"/><circle cx="46" cy="28" r="2.2" fill="#FF9F1C"/>
+      {/* orelhas */}
+      <ellipse cx="22" cy="14" rx="7" ry="9" fill="#FFD93D" stroke="#111" strokeWidth="2"/><ellipse cx="22" cy="14" rx="3" ry="5" fill="#FF9F1C"/>
+      <ellipse cx="58" cy="14" rx="7" ry="9" fill="#FFD93D" stroke="#111" strokeWidth="2"/><ellipse cx="58" cy="14" rx="3" ry="5" fill="#FF9F1C"/>
+      {/* chifres */}
+      <line x1="32" y1="8" x2="30" y2="2" stroke="#111" strokeWidth="2.5" strokeLinecap="round"/><circle cx="30" cy="2" r="3" fill="#8B5A00" stroke="#111" strokeWidth="1.5"/>
+      <line x1="48" y1="8" x2="50" y2="2" stroke="#111" strokeWidth="2.5" strokeLinecap="round"/><circle cx="50" cy="2" r="3" fill="#8B5A00" stroke="#111" strokeWidth="1.5"/>
+      {/* olhos */}
+      <circle cx="32" cy="26" r="5" fill="white" stroke="#111" strokeWidth="1.5"/>
+      <circle cx="48" cy="26" r="5" fill="white" stroke="#111" strokeWidth="1.5"/>
+      <circle cx={isHappy?33:32} cy="27" r="2.2" fill="#111"/><circle cx={isHappy?49:48} cy="27" r="2.2" fill="#111"/>
+      <circle cx="33" cy="25.5" r="0.9" fill="white"/><circle cx="49" cy="25.5" r="0.9" fill="white"/>
+      {isHappy && (<path d="M27 20 C 30 17, 34 17, 37 20" stroke="#111" strokeWidth="1.3" fill="none" strokeLinecap="round"/>)}
+      {isHappy && (<path d="M43 20 C 46 17, 50 17, 53 20" stroke="#111" strokeWidth="1.3" fill="none" strokeLinecap="round"/>)}
+      {/* focinho */}
+      <ellipse cx="40" cy="34" rx="10" ry="6" fill="white" stroke="#111" strokeWidth="1.5"/>
+      <ellipse cx="37" cy="34" rx="1.4" ry="1.8" fill="#111"/><ellipse cx="43" cy="34" rx="1.4" ry="1.8" fill="#111"/>
+      {isHappy ? <path d="M36 37 Q 40 40, 44 37" stroke="#111" strokeWidth="1.6" fill="none" strokeLinecap="round"/> : <path d="M38 38 Q 40 36.5, 42 38" stroke="#111" strokeWidth="1.4" fill="none"/>}
+      {/* bochecha */}
+      {isHappy && <circle cx="24" cy="32" r="2.5" fill="#FF6B6B" opacity="0.35"/>}
+      {isHappy && <circle cx="56" cy="32" r="2.5" fill="#FF6B6B" opacity="0.35"/>}
+      {/* estrelinha celeb */}
+      {isCelebrate && <text x="62" y="8" fontSize="10">✨</text>}
+    </svg>
+  );
+}
+function ChacMascot({mood="grumpy", size=56}){
+  const isSad = mood==="sad";
+  return (
+    <svg width={size} height={size} viewBox="0 0 80 80">
+      <ellipse cx="40" cy="72" rx="16" ry="5" fill="#000" opacity="0.07"/>
+      <rect x="30" y="48" width="20" height="16" rx="7" fill="#FF8A65" stroke="#111" strokeWidth="2.2"/>
+      <path d="M30 55 L 18 58 L 30 62" fill="#FF8A65" stroke="#111" strokeWidth="1.8" strokeLinejoin="round"/>
+      {/* cabeça */}
+      <circle cx="40" cy="28" r="20" fill="#FF8A65" stroke="#111" strokeWidth="2.3"/>
+      {/* focinho escuro */}
+      <ellipse cx="40" cy="36" rx="12" ry="9" fill="#4B2E2E" stroke="#111" strokeWidth="1.6"/>
+      <ellipse cx="40" cy="32" rx="6" ry="4.5" fill="#2D1A1A"/>
+      <circle cx="36" cy="31" r="1.2" fill="#111"/><circle cx="44" cy="31" r="1.2" fill="#111"/>
+      <ellipse cx="40" cy="37" rx="3" ry="2" fill="#111"/>
+      {/* orelhas pontudas */}
+      <path d="M18 18 L 22 4 L 32 14" fill="#FF7043" stroke="#111" strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M62 18 L 58 4 L 48 14" fill="#FF7043" stroke="#111" strokeWidth="2" strokeLinejoin="round"/>
+      <path d="M22 12 L 23 7 L 27 11" fill="#FFCCBC"/>
+      <path d="M58 12 L 57 7 L 53 11" fill="#FFCCBC"/>
+      {/* olhos */}
+      <ellipse cx="32" cy="24" rx="5" ry="4.5" fill="white" stroke="#111" strokeWidth="1.3"/>
+      <ellipse cx="48" cy="24" rx="5" ry="4.5" fill="white" stroke="#111" strokeWidth="1.3"/>
+      <circle cx={isSad?31:32} cy="25" r="2" fill="#111"/><circle cx={isSad?47:48} cy="25" r="2" fill="#111"/>
+      <path d="M28 20 L 36 21" stroke="#111" strokeWidth="2" strokeLinecap="round"/>
+      <path d="M52 20 L 44 21" stroke="#111" strokeWidth="2" strokeLinecap="round"/>
+      {isSad && <path d="M31 34 Q 40 30, 49 34" stroke="white" strokeWidth="1.4" fill="none" strokeLinecap="round" opacity="0.9"/>}
+      {!isSad && <path d="M33 38 Q 40 41, 47 38" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/>}
+    </svg>
+  );
+}
+
+function App(){
+  const [foco,setFoco]=useState(null);
+  const [showOnboarding,setShowOnboarding]=useState(true);
+  const [view,setView]=useState('map');
+  const [faseAtiva,setFaseAtiva]=useState(1);
+  const [exIdx,setExIdx]=useState(0);
+  const [xp,setXp]=useState(0);
+  const [gems,setGems]=useState(12);
+  const [vidas,setVidas]=useState(5);
+  const [streak,setStreak]=useState(0);
+  const [completos,setCompletos]=useState({});
+  const [unlocked,setUnlocked]=useState(1);
+  const [nerd,setNerd]=useState(false);
+  const [resposta,setResposta]=useState(null);
+  const [showExp,setShowExp]=useState(false);
+  const [shake,setShake]=useState(false);
+  const [pulse,setPulse]=useState(false);
+  const [dragOrder,setDragOrder]=useState([]);
+  const [triagem,setTriagem]=useState({situacao:"", sentimento:"", necessidade:"", pedido:""});
+  const [diario,setDiario]=useState([]);
+  const [toast,setToast]=useState(null);
+  const [showConfetti,setShowConfetti]=useState(false);
+  const [flying,setFlying]=useState([]);
+  const [muted,setMuted]=useState(false);
+  const [daily,setDaily]=useState({date: new Date().toISOString().slice(0,10), exToday:0, triageToday:0, chestOpened:false});
+  const audioRef = useRef(null);
+
+  // audio helper
+  function beep(freq=880, dur=120, type='sine', vol=0.12){
+    if(muted) return;
+    try{
+      const ctx = audioRef.current || (audioRef.current = new (window.AudioContext||window.webkitAudioContext)());
+      if(ctx.state==='suspended') ctx.resume();
+      const o=ctx.createOscillator(); const g=ctx.createGain();
+      o.type=type; o.frequency.value=freq; g.gain.value=vol;
+      o.connect(g); g.connect(ctx.destination);
+      o.start(); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+dur/1000);
+      o.stop(ctx.currentTime+dur/1000);
+    }catch(e){}
+  }
+  function soundCorrect(){ beep(880,120,'sine',0.14); setTimeout(()=>beep(1175,160,'sine',0.13),110); setTimeout(()=>beep(1568,220,'triangle',0.09),260); }
+  function soundWrong(){ beep(220,180,'square',0.08); setTimeout(()=>beep(180,220,'square',0.06),140); }
+  function soundCoin(){ beep(1200,90,'sine',0.1); setTimeout(()=>beep(1600,110,'sine',0.09),80); }
+  function soundChest(){ [523,659,784,1046].forEach((f,i)=> setTimeout(()=>beep(f,140,'triangle',0.11), i*90)); }
+
+  useEffect(()=>{
+    try{
+      const raw=localStorage.getItem("girafes_gabi_precision_v1");
+      if(raw){
+        const d=JSON.parse(raw);
+        if(d.foco){ setFoco(d.foco); setShowOnboarding(false);}
+        if(d.xp) setXp(d.xp);
+        if(d.vidas) setVidas(d.vidas);
+        if(d.completos) setCompletos(d.completos);
+        if(d.unlocked) setUnlocked(d.unlocked);
+        if(d.faseAtiva) setFaseAtiva(d.faseAtiva);
+        if(d.streak) setStreak(d.streak);
+        if(d.diario) setDiario(d.diario);
+        if(d.gems) setGems(d.gems);
+        if(d.daily){
+          const today = new Date().toISOString().slice(0,10);
+          if(d.daily.date===today) setDaily(d.daily);
+          else setDaily({date:today, exToday:0, triageToday:0, chestOpened:false});
+        }
+        if(d.muted!==undefined) setMuted(d.muted);
+      }
+    }catch(e){}
+  },[]);
+  useEffect(()=>{
+    localStorage.setItem("girafes_gabi_precision_v1", JSON.stringify({foco,xp,vidas,completos,unlocked,faseAtiva,streak,diario,gems,daily,muted}));
+  },[foco,xp,vidas,completos,unlocked,faseAtiva,streak,diario,gems,daily,muted]);
+
+  const faseObj = useMemo(()=>FASES.find(f=>f.id===faseAtiva),[faseAtiva]);
+  const exerciciosDaFase = useMemo(()=>EXERCICIOS.filter(e=>e.fase===faseAtiva),[faseAtiva]);
+  const exercicio = exerciciosDaFase[exIdx];
+  const progressoGeral = useMemo(()=> Math.round(Object.keys(completos).length/40*100),[completos]);
+
+  useEffect(()=>{
+    if(exercicio && exercicio.type==='word_syntax'){
+      const arr=[...exercicio.blocksCorrect];
+      for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; }
+      if(JSON.stringify(arr)===JSON.stringify(exercicio.blocksCorrect)) [arr[0],arr[1]]=[arr[1],arr[0]];
+      setDragOrder(arr);
+    }
+    setResposta(null); setShowExp(false); setShake(false);
+  },[exercicio?.id]);
+
+  function showToastMsg(m){ setToast(m); setTimeout(()=>setToast(null),2400); }
+  function escolherFoco(f){ setFoco(f); setShowOnboarding(false); setView('map'); beep(700,100); showToastMsg(`Bora, Gabi! Foco ${f} ativado 🔥`); }
+  function openFase(id){
+    if(id>unlocked){ beep(180,120); showToastMsg("Mundo bloqueado! Complete o anterior 🎮"); return; }
+    beep(600,80); setFaseAtiva(id); setExIdx(0); setView('exercise'); window.scrollTo({top:0,behavior:'smooth'});
+  }
+  function spawnFlying(){
+    const id=Date.now()+Math.random();
+    setFlying(f=>[...f,{id}]);
+    setTimeout(()=> setFlying(f=>f.filter(x=>x.id!==id)),800);
+  }
+  function validar(tipo,valor){
+    let ok=false;
+    if(tipo==='triagem') ok=valor==='girafa';
+    else if(tipo==='semiotica_bloqueios'){ const o=exercicio.options.find(x=>x.label===valor); ok=!!o?.correct; }
+    else if(tipo==='sinal_vs_juizo') ok=(valor==='autentico')===exercicio.isAuthentic;
+    else if(tipo==='escuta_clinica'){ const o=exercicio.options.find(x=>x.label===valor); ok=!!o?.correct; }
+    else if(tipo==='word_syntax') ok=JSON.stringify(valor)===JSON.stringify(exercicio.blocksCorrect);
+    setResposta(ok?'correto':'errado'); setShowExp(true);
+    if(ok){
+      soundCorrect(); spawnFlying();
+      setPulse(true); setTimeout(()=>setPulse(false),600);
+      setShowConfetti(true); setTimeout(()=>setShowConfetti(false),900);
+      if(!completos[exercicio.id]){
+        setCompletos(p=>({...p,[exercicio.id]:true}));
+        setXp(x=>x+20); setGems(g=>g+5); setStreak(s=>s+1);
+        setDaily(d=>{
+          const nd={...d, exToday: d.exToday+1};
+          // if daily completed and not opened, keep ready
+          return nd;
+        });
+        const restantes = exerciciosDaFase.filter(e=> e.id!==exercicio.id && !completos[e.id]);
+        if(restantes.length===0){
+          if(faseAtiva<8 && faseAtiva===unlocked){ setUnlocked(u=>u+1); setTimeout(()=>soundChest(),400); showToastMsg(`MUNDO ${faseAtiva} COMPLETO! Próximo desbloqueado 🌟`); }
+          else if(faseAtiva===8) showToastMsg("AVENTURA COMPLETA! Certificado liberado 🎉");
+        }
+      }
+      if(navigator.vibrate) navigator.vibrate(20);
+    } else {
+      soundWrong(); setShake(true); setTimeout(()=>setShake(false),500);
+      setVidas(v=> Math.max(0,v-1)); setStreak(0);
+      if(navigator.vibrate) navigator.vibrate([30,30,60]);
+      if(vidas<=1) setTimeout(()=>{ setVidas(5); showToastMsg("Corações recarregados! Respira 💛"); },1200);
+    }
+  }
+  function proximo(){
+    if(exIdx < exerciciosDaFase.length-1){ beep(500,60); setExIdx(i=>i+1); }
+    else { if(faseAtiva<8) { beep(700,100); setView('map'); showToastMsg("Mundo concluído!"); } else setView('certificado'); }
+    setResposta(null); setShowExp(false);
+  }
+  function handleDrag(from,to){ const a=[...dragOrder]; const [m]=a.splice(from,1); a.splice(to,0,m); setDragOrder(a); beep(500,40); }
+  function gerarGirafa(){
+    if(!triagem.situacao||!triagem.sentimento||!triagem.necessidade||!triagem.pedido){ beep(200,120); showToastMsg("Preencha os 4 blocos!"); return; }
+    const texto=`Quando ${triagem.situacao}, sinto ${triagem.sentimento} porque preciso de ${triagem.necessidade}. Você poderia ${triagem.pedido}?`;
+    setDiario(d=>[{id:Date.now(), texto, foco, data:new Date().toISOString()},...d]);
+    setDaily(d=>({...d, triageToday: d.triageToday+1}));
+    soundCoin(); spawnFlying(); showToastMsg("Girafês criado! +30 XP ✨"); setXp(x=>x+30); setGems(g=>g+8);
+    setTriagem({situacao:"", sentimento:"", necessidade:"", pedido:""});
+  }
+  function abrirBau(){
+    if(daily.chestOpened) return;
+    const ready = daily.exToday>=3 && daily.triageToday>=1;
+    if(!ready){ showToastMsg("Complete 3 Girafês + 1 Triagem pra abrir!"); beep(180,100); return; }
+    soundChest(); setDaily(d=>({...d, chestOpened:true}));
+    setGems(g=>g+20); setXp(x=>x+50);
+    setShowConfetti(true); setTimeout(()=>setShowConfetti(false),1200);
+    showToastMsg("BAÚ DOURADO! +20 💎 +50 XP 🎉");
+    if(navigator.vibrate) navigator.vibrate([20,30,20,40]);
+  }
+  function freezeStreak(){
+    if(gems<10){ showToastMsg("Precisa de 10 💎 para congelar!"); return; }
+    setGems(g=>g-10); setStreak(s=>Math.max(s,1));
+    soundCoin(); showToastMsg("Streak congelado! 🔥❄️");
+  }
+
+  const pctFase = Math.round(Object.keys(completos).filter(k=>k.startsWith(faseAtiva+'-')).length/5*100);
+  const dailyReady = daily.exToday>=3 && daily.triageToday>=1 && !daily.chestOpened;
+  const dailyPct = Math.min(100, Math.round(((Math.min(daily.exToday,3)/3)*0.7 + (Math.min(daily.triageToday,1)/1)*0.3)*100));
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      {/* HEADER */}
+      <header className="sticky top-0 z-30 bg-white border-b-[4px] border-zinc-900">
+        <div className="max-w-[1160px] mx-auto px-3 md:px-6 h-[64px] flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 md:gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-[#58CC02] border-[3px] border-zinc-900 flex items-center justify-center shadow-[0_3px_0_#111] overflow-hidden p-1"><GiraMascot size={36} mood="happy"/></div>
+            <div className="leading-none">
+              <div className="game font-black text-[15px] md:text-[17px] tracking-tight">Girafês da Gabi</div>
+              <div className="hidden md:block text-[10px] font-bold tracking-widest text-zinc-400 -mt-0.5">AVENTURA CNV • DUOLINGO EDITION</div>
+            </div>
+            <span className="hidden lg:inline-flex ml-2 px-2.5 py-1 rounded-full bg-[#FFF1A6] border-2 border-zinc-900 text-[11px] font-black">PRESENTE DO VINICIUS • 2026</span>
+          </div>
+          <div className="flex items-center gap-1.5 md:gap-2">
+            <div className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#FFECEE] border-2 border-zinc-900 game font-black text-[#FF4B82] text-[13px]"><span>❤️</span> {vidas}</div>
+            <div className="hidden md:flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#FFF4CC] border-2 border-zinc-900 game font-black text-[#FF9600] text-[13px]"><span>🔥</span> {streak}</div>
+            <div className="relative flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#E6FFE1] border-2 border-zinc-900 game font-black text-[#46A302] text-[13px]"><span>⚡</span> {xp} XP
+              {flying.map(f=>(
+                <span key={f.id} className="fly-gem absolute left-1/2 top-1/2 text-[12px] font-black pointer-events-none" style={{"--tx": (Math.random()*40-20)+"px", "--ty":"-52px"}}>+5 💎</span>
+              ))}
+            </div>
+            <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#E6F7FF] border-2 border-zinc-900 game font-black text-[#1CB0F6] text-[13px]"><span>💎</span> {gems}</div>
+            <button onClick={()=>setMuted(m=>!m)} className="w-9 h-9 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center press text-[14px]">{muted?'🔇':'🔊'}</button>
+            <button onClick={()=>setNerd(v=>!v)} className={`hidden md:inline-flex game font-black text-[11px] px-3 py-1.5 rounded-full border-2 press ${nerd?'bg-[#9A5CFF] text-white border-zinc-900 shadow-3d-purple':'bg-white text-zinc-500 border-zinc-200'}`}>🧬 {nerd?'ON':'OFF'}</button>
+          </div>
+        </div>
+        <div className="h-2.5 bg-zinc-100 border-t border-zinc-900"><div className="h-full bg-[#58CC02] transition-all" style={{width:`${progressoGeral}%`}}></div></div>
+      </header>
+
+      {showOnboarding && (
+        <div className="fixed inset-0 z-40 bg-[#FFFBF0] overflow-auto pattern-dots">
+          <div className="max-w-[760px] mx-auto px-4 py-8 md:py-10">
+            <div className="bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden animate-pop">
+              <div className="bg-[#58CC02] px-6 py-3 flex items-center justify-between border-b-[3px] border-zinc-900">
+                <span className="game font-black text-white tracking-wide text-[13px]">🎁 UM PRESENTE DE VINICIUS PARA A GABI — 2026</span>
+                <span className="hidden md:inline-flex bg-white px-2 py-1 rounded-full text-[11px] font-black border-2 border-zinc-900">MADE WITH 💚</span>
+              </div>
+              <div className="p-6 md:p-8">
+                <div className="flex flex-col md:flex-row gap-6 items-start">
+                  <div className="shrink-0 float"><GiraMascot size={86} mood="celebrate"/></div>
+                  <div>
+                    <h1 className="game font-black text-[28px] md:text-[36px] leading-none tracking-tight">Oi, Dra. Gabi! <br/><span className="text-[#58CC02]">Bora jogar</span> comunicação?</h1>
+                    <p className="mt-3 text-[14px] leading-relaxed font-medium text-zinc-600">8 mundos, 40 fases, sons, mascotes e baú diário. É game de verdade, com coração e ciência. Mantém seu streak e coleta gemas!</p>
+                  </div>
+                </div>
+                <div className="mt-6 grid grid-cols-3 gap-2">
+                  <div className="rounded-2xl bg-[#E6FFE1] border-2 border-zinc-900 p-3 text-center"><div className="game font-black text-[#46A302]">40</div><div className="text-[11px] font-bold text-zinc-600">FASES</div></div>
+                  <div className="rounded-2xl bg-[#E6F7FF] border-2 border-zinc-900 p-3 text-center"><div className="game font-black text-[#1CB0F6]">8</div><div className="text-[11px] font-bold text-zinc-600">MUNDOS</div></div>
+                  <div className="rounded-2xl bg-[#FFF4CC] border-2 border-zinc-900 p-3 text-center"><div className="game font-black text-[#B89A00]">🔊</div><div className="text-[11px] font-bold text-zinc-600">COM SOM</div></div>
+                </div>
+                <div className="mt-6 game font-black text-[13px] tracking-widest text-zinc-500">ESCOLHA SEU MODO DE JOGO</div>
+                <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {[
+                    {id:"Clínica / Trabalho", emoji:"🏥", color:"bg-[#1CB0F6]", desc:"Plantão, equipe, pacientes"},
+                    {id:"Relações Pessoais", emoji:"💕", color:"bg-[#FF4B82]", desc:"Amor, amizades, parceria"},
+                    {id:"Família", emoji:"🏡", color:"bg-[#FF9600]", desc:"Origem, limites, cuidado"},
+                    {id:"Autocompaixão", emoji:"🪞", color:"bg-[#9A5CFF]", desc:"Voz interna, autocuidado"},
+                  ].map(c=>(
+                    <button key={c.id} onClick={()=>escolherFoco(c.id)} className={`text-left p-4 rounded-2xl border-[3px] border-zinc-900 press flex gap-3 items-center ${c.color} text-white shadow-[0_5px_0_#111] hover:brightness-105`}>
+                      <div className="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-[24px] border-2 border-zinc-900 shrink-0">{c.emoji}</div>
+                      <div><div className="game font-black text-[15px] leading-none">{c.id}</div><div className="text-[12px] font-bold opacity-90">{c.desc}</div></div>
+                    </button>
+                  ))}
+                </div>
+                <div className="text-center text-[11px] font-bold text-zinc-400 mt-4">com som, mascotes e baú — protocolo por V. para G. 🎮</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <main className="flex-1 max-w-[1160px] w-full mx-auto px-3 md:px-6 py-4 md:py-6 grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-4 md:gap-6">
+        <aside className="lg:sticky lg:top-[78px] self-start space-y-4">
+          {/* Missão Diária + Baú */}
+          <div className={`rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] overflow-hidden ${dailyReady?'bg-[#FFF4CC] chest-ready':'bg-white'}`}>
+            <div className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="game font-black text-[13px] flex items-center gap-1.5">🎯 Missão do Dia <span className="text-[11px] bg-zinc-900 text-white px-2 py-0.5 rounded-full">{daily.date.slice(5).replace('-','/')}</span></div>
+                <span className={`game font-black text-[11px] px-2 py-1 rounded-full border-2 ${dailyReady?'bg-[#58CC02] text-white border-zinc-900':'bg-zinc-100 border-zinc-200'}`}>{dailyPct}%</span>
+              </div>
+              <div className="mt-3 space-y-2">
+                <div className="flex items-center justify-between text-[12px] font-black"><span>🦒 3 Girafês</span><span className={daily.exToday>=3?'text-[#58CC02]':''}>{Math.min(daily.exToday,3)}/3</span></div>
+                <div className="h-2.5 bg-zinc-100 rounded-full border-2 border-zinc-900 overflow-hidden p-1"><div className="h-full bg-[#58CC02] rounded-full transition-all" style={{width:`${Math.min(daily.exToday,3)/3*100}%`}}></div></div>
+                <div className="flex items-center justify-between text-[12px] font-black"><span>🔧 1 Triagem real</span><span className={daily.triageToday>=1?'text-[#1CB0F6]':''}>{Math.min(daily.triageToday,1)}/1</span></div>
+                <div className="h-2.5 bg-zinc-100 rounded-full border-2 border-zinc-900 overflow-hidden p-1"><div className="h-full bg-[#1CB0F6] rounded-full transition-all" style={{width:`${Math.min(daily.triageToday,1)*100}%`}}></div></div>
+              </div>
+              <button onClick={abrirBau} disabled={daily.chestOpened} className={`mt-3 w-full py-3 rounded-full game font-black border-b-[4px] press flex items-center justify-center gap-2 ${daily.chestOpened?'bg-zinc-100 text-zinc-400 border-zinc-200': dailyReady?'bg-[#FFD900] text-zinc-900 border-[#E5B700] shadow-[0_3px_0_#111] wiggle':'bg-zinc-900 text-white border-black opacity-60'}`}>
+                <span className="text-[18px]">{daily.chestOpened?'✅': dailyReady?'🎁':'🔒'}</span> {daily.chestOpened?'Baú aberto!':'Abrir Baú Dourado → +20 💎 +50 XP'}
+              </button>
+              {daily.chestOpened && <div className="text-center text-[11px] font-black text-zinc-500 mt-2">Volta amanhã para novo baú! 🔥 Streak: {streak} dias</div>}
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] overflow-hidden">
+            <div className="p-4 flex items-center justify-between">
+              <div className="game font-black text-[15px]">🗺️ Mapa</div>
+              <span className="game font-black text-[12px] bg-zinc-900 text-white px-2.5 py-1 rounded-full">{Object.keys(completos).length}/40</span>
+            </div>
+            <div className="px-4 pb-2">
+              <div className="h-3 bg-zinc-100 rounded-full border-2 border-zinc-900 overflow-hidden p-1"><div className="h-full bg-[#58CC02] rounded-full transition-all" style={{width:`${progressoGeral}%`}}></div></div>
+              <div className="flex justify-between text-[11px] font-black text-zinc-500 mt-1"><span>PROGRESSO</span><span>{progressoGeral}%</span></div>
+              <div className="flex gap-1.5 mt-2">
+                <button onClick={()=>setView('map')} className={`flex-1 game font-black text-[12px] py-2 rounded-full border-2 press ${view==='map'?'bg-zinc-900 text-white border-zinc-900':'bg-white border-zinc-200'}`}>MAPA</button>
+                <button onClick={()=>setView('triage')} className={`flex-1 game font-black text-[12px] py-2 rounded-full border-2 press ${view==='triage'?'bg-[#1CB0F6] text-white border-zinc-900 shadow-3d-blue':'bg-white border-zinc-200'}`}>TRIAGEM</button>
+                <button onClick={()=>setView('certificado')} className={`game font-black text-[12px] px-3 py-2 rounded-full border-2 press ${view==='certificado'?'bg-[#FFD900] border-zinc-900 shadow-3d-yellow':'bg-white border-zinc-200'}`}>🏆</button>
+              </div>
+            </div>
+            <div className="relative px-4 pb-4">
+              <svg className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[40px] h-full hidden md:block" viewBox="0 0 40 800" preserveAspectRatio="none"><path d="M20 0 C 40 80, 0 160, 20 240 C 40 320, 0 400, 20 480 C 40 560, 0 640, 20 720" stroke="#E4E4E7" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray="14 14"/></svg>
+              <div className="space-y-3 relative">
+                {FASES.map(f=>{
+                  const unlockedNow = f.id <= unlocked;
+                  const done = f.id < unlocked || (f.id===8 && Object.keys(completos).filter(k=>k.startsWith('8-')).length===5);
+                  const active = f.id===faseAtiva;
+                  const doneCount = Object.keys(completos).filter(k=>k.startsWith(f.id+'-')).length;
+                  const offset = f.id%2===0 ? 'md:ml-8' : 'md:mr-8';
+                  return (
+                    <button key={f.id} onClick={()=>openFase(f.id)} className={`w-full text-left relative flex items-center gap-3 p-3 rounded-[20px] border-[3px] press ${offset} ${active?'bg-white border-zinc-900 shadow-[0_5px_0_#111]':'bg-white border-zinc-200 shadow-3d-zinc'} ${!unlockedNow?'opacity-60 grayscale-[0.3]':''}`}>
+                      <div className={`w-[56px] h-[56px] rounded-full flex items-center justify-center text-[22px] border-[3px] shrink-0 overflow-hidden ${done?'bg-[#58CC02] border-[#46A302] text-white': active? `border-zinc-900` : unlockedNow? 'bg-white border-zinc-900':'bg-zinc-100 border-zinc-300'}`} style={{background: done?'#58CC02': active? f.color:'#fff', boxShadow: done?'0 4px 0 #46A302': active? `0 4px 0 ${f.dark}`:'0 4px 0 #111'}}>
+                        <span className="scale-90">{done?'✓': f.emoji}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="game font-black text-[10px] tracking-widest px-1.5 py-0.5 rounded-full bg-zinc-900 text-white">{f.code}</span>
+                          {done && <span className="text-[10px] font-black bg-[#E6FFE1] text-[#46A302] px-1.5 py-0.5 rounded-full border border-[#58CC02]">FEITO!</span>}
+                          {active && !done && <span className="text-[10px] font-black bg-[#1CB0F6] text-white px-1.5 py-0.5 rounded-full">JOGAR</span>}
+                        </div>
+                        <div className="game font-black text-[13px] leading-none truncate">{f.titulo}</div>
+                        <div className="text-[11px] font-bold text-zinc-500 truncate">{f.subtitulo} • {doneCount}/5 ⭐</div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            <div className="px-4 py-3 bg-zinc-50 border-t-[3px] border-zinc-900 flex items-center justify-between">
+              <span className="text-[11px] font-black text-zinc-500 flex items-center gap-1">🔥 {streak} dias <button onClick={freezeStreak} className="ml-2 px-2 py-1 rounded-full bg-white border-2 border-zinc-900 text-[10px]">❄️ Congelar (10💎)</button></span>
+              <button onClick={()=>{localStorage.removeItem("girafes_gabi_precision_v1"); location.reload();}} className="text-[11px] font-black underline">REINICIAR</button>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-[20px] border-[3px] border-zinc-900 shadow-[0_5px_0_#111] p-4">
+            <div className="flex items-center justify-between"><span className="game font-black text-[12px] flex items-center gap-1.5"><GiraMascot size={24} mood="happy"/> Diário</span><span className="game font-black text-[11px] bg-zinc-900 text-white px-2 py-0.5 rounded-full">{diario.length}</span></div>
+            {diario.length===0? <div className="text-[12px] font-bold text-zinc-500 mt-2">Nenhum Girafês ainda. Crie um na Triagem!</div>:
+              <div className="space-y-2 mt-2 max-h-[220px] overflow-auto scrollbar-hide">
+                {diario.slice(0,3).map(d=>(
+                  <div key={d.id} className="p-3 rounded-2xl bg-[#FFFBF0] border-2 border-zinc-900">
+                    <div className="text-[10px] font-black text-zinc-500">{new Date(d.data).toLocaleDateString('pt-BR')} • {d.foco}</div>
+                    <div className="text-[12px] font-bold leading-snug mt-1">“{d.texto}”</div>
+                  </div>
+                ))}
+              </div>
+            }
+          </div>
+        </aside>
+
+        <section className="min-w-0 space-y-4">
+          {view==='map' && (
+            <div className="space-y-4">
+              <div className="bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden">
+                <div className={`h-2 w-full`} style={{background: faseObj.color}}></div>
+                <div className="p-6 md:p-7">
+                  <div className="flex items-start gap-4">
+                    <div className={`w-16 h-16 rounded-[18px] flex items-center justify-center border-[3px] border-zinc-900 shrink-0 overflow-hidden`} style={{background: faseObj.color, boxShadow:`0 4px 0 ${faseObj.dark}`}}><span className="text-[30px]">{faseObj.emoji}</span></div>
+                    <div className="flex-1">
+                      <div className="game font-black text-[12px] tracking-widest text-zinc-500">{faseObj.code}</div>
+                      <h2 className="game font-black text-[24px] md:text-[28px] leading-none tracking-tight">{faseObj.titulo}</h2>
+                      <div className="text-[13px] font-bold text-zinc-500">{faseObj.subtitulo}</div>
+                    </div>
+                    <div className="hidden md:flex flex-col items-center gap-1">
+                      <div className="w-14 h-14 rounded-full border-[3px] border-zinc-900 flex items-center justify-center game font-black text-[14px]" style={{background:`conic-gradient(${faseObj.color} ${pctFase}%, #f4f4f5 0)`}}><span className="bg-white w-10 h-10 rounded-full flex items-center justify-center border-2 border-zinc-900">{pctFase}%</span></div>
+                    </div>
+                  </div>
+                  <p className="text-[14px] font-medium text-zinc-600 leading-relaxed mt-4">{faseObj.desc}</p>
+                  {nerd && (
+                    <div className="mt-4 p-4 rounded-2xl bg-[#F4F0FF] border-2 border-zinc-900">
+                      <div className="game font-black text-[12px] text-[#9A5CFF]">🧬 {faseObj.nerdTitle}</div>
+                      <div className="text-[13px] font-medium text-zinc-700 mt-1">{faseObj.nerdDesc}</div>
+                    </div>
+                  )}
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    <button onClick={()=>openFase(faseAtiva)} className="px-7 py-3.5 rounded-full game font-black text-[16px] text-white border-b-[5px] press" style={{background:faseObj.color, borderColor:faseObj.dark, boxShadow:`0 3px 0 ${faseObj.dark}`}}>▶ JOGAR AGORA</button>
+                    <button onClick={()=>{beep(600,60); showToastMsg(muted?"Som ativado 🔊":"Som mutado 🔇"); setMuted(!muted);}} className="px-4 py-3.5 rounded-full bg-white border-[3px] border-zinc-900 game font-black press">{muted?'🔇 Som off':'🔊 Som on'}</button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 bg-zinc-50 border-t-[3px] border-zinc-900">
+                  {[
+                    {k:"01 OBSERVAÇÃO", c:"#1CB0F6"},
+                    {k:"02 SENTIMENTO", c:"#FF9600"},
+                    {k:"03 NECESSIDADE", c:"#9A5CFF"},
+                    {k:"04 PEDIDO", c:"#58CC02"},
+                  ].map(m=>(
+                    <div key={m.k} className="text-center p-2 rounded-2xl bg-white border-2 border-zinc-900">
+                      <div className="w-2 h-2 rounded-full mx-auto" style={{background:m.c}}></div>
+                      <div className="game font-black text-[10px] mt-1">{m.k}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="bg-white rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] p-4">
+                <div className="game font-black text-[13px]">⭐ Fases deste mundo</div>
+                <div className="mt-3 grid grid-cols-5 gap-2">
+                  {exerciciosDaFase.map((ex,i)=>{
+                    const done = !!completos[ex.id];
+                    const active = i===exIdx;
+                    return (
+                      <button key={ex.id} onClick={()=>{ beep(500,50); setExIdx(i); setView('exercise'); }} className={`aspect-square rounded-2xl border-[3px] flex flex-col items-center justify-center gap-1 press ${done?'bg-[#58CC02] border-[#46A302] text-white shadow-3d-green': active?'bg-[#FFD900] border-[#E5B700] shadow-3d-yellow':'bg-white border-zinc-200 shadow-3d-zinc'}`}>
+                        <span className="game font-black text-[16px]">{done?'✓':i+1}</span>
+                        <span className="text-[9px] font-black leading-none text-center px-1">{ex.type==='triagem'?'VS':ex.type==='word_syntax'?'ORDEM':ex.type==='semiotica_bloqueios'?'BLOCO':ex.type==='sinal_vs_juizo'?'SINAL':'ESCUTA'}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-3">
+                <div className="bg-[#1CB0F6] rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] p-5 text-white">
+                  <div className="game font-black flex items-center gap-2"><GiraMascot size={28} mood="happy"/> Como jogar?</div>
+                  <div className="text-[13px] font-bold mt-2 leading-relaxed">1️⃣ Escolha Girafa vs Chacal<br/>2️⃣ Ordene blocos OFNP<br/>3️⃣ Desmascare bloqueios<br/>4️⃣ Cerque com empatia</div>
+                </div>
+                <div className="bg-zinc-900 rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] p-5 text-white">
+                  <div className="game font-black text-[#FFD900]">💌 Para a Gabi</div>
+                  <div className="text-[13px] font-medium leading-relaxed mt-2 text-zinc-100">“Cada fase é um treino de coração. 1% mais girafa a cada jogada.”</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {view==='exercise' && exercicio && (
+            <div className={`bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden ${shake?'animate-shake':''} ${pulse?'pulse-glow':''} relative`}>
+              {showConfetti && (
+                <div className="pointer-events-none absolute inset-0 overflow-hidden z-10">
+                  {[...Array(14)].map((_,i)=>(
+                    <span key={i} className="absolute text-[18px]" style={{left: `${8+i*7}%`, top:'-10px', animation:`confetti ${600+Math.random()*400}ms ease forwards`, animationDelay:`${i*40}ms`}}>{['🎉','✨','⭐','💚','💎'][i%5]}</span>
+                  ))}
+                </div>
+              )}
+              <div className="px-5 md:px-7 pt-5 pb-4 border-b-[3px] border-zinc-900 bg-zinc-50 flex items-center gap-3">
+                <button onClick={()=>setView('map')} className="w-9 h-9 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center press">←</button>
+                <div className="flex-1"><div className="h-3 bg-white rounded-full border-2 border-zinc-900 overflow-hidden p-1"><div className="h-full rounded-full transition-all" style={{width:`${((exIdx+1)/5)*100}%`, background: faseObj.color}}></div></div></div>
+                <span className="game font-black text-[12px] bg-white border-2 border-zinc-900 px-2.5 py-1 rounded-full">❤️ {vidas}</span>
+              </div>
+
+              <div className="p-5 md:p-7">
+                {/* Gira falando */}
+                <div className="flex gap-3 items-start mb-4">
+                  <div className="shrink-0 hidden md:block"><GiraMascot size={64} mood={resposta==='correto'?'celebrate': resposta==='errado'?'happy':'happy'}/></div>
+                  <div className="flex-1">
+                    <div className="inline-flex items-center gap-2">
+                      <span className="game font-black text-[11px] tracking-widest px-2.5 py-1 rounded-full border-2 border-zinc-900 text-white" style={{background:faseObj.color}}>{exercicio.id}</span>
+                      <span className="game font-black text-[11px] tracking-widest text-zinc-500">{{triagem:"DUELO 🦒⚡🐺", word_syntax:"MONTE A FRASE 🧩", semiotica_bloqueios:"DESMASCARE 🕵️", sinal_vs_juizo:"SINAL OU JUÍZO? 💛", escuta_clinica:"ESCUTA 👂"}[exercicio.type]}</span>
+                    </div>
+                    <div className="mt-2 bg-white border-[3px] border-zinc-900 rounded-[18px] p-3 md:p-4 relative shadow-[0_3px_0_#111]">
+                      <div className="absolute -left-2 top-4 w-3 h-3 bg-white border-l-[3px] border-b-[3px] border-zinc-900 rotate-45 hidden md:block"></div>
+                      <h3 className="game font-black text-[16px] md:text-[18px] leading-tight">{exercicio.prompt}</h3>
+                      {exercicio.statement && <div className="text-[12px] font-bold text-zinc-600 mt-1">“{exercicio.statement}”</div>}
+                      {exercicio.speaker && <div className="text-[13px] font-bold bg-[#E6F7FF] rounded-xl p-2 mt-2 border-2 border-zinc-900">“{exercicio.speaker}”</div>}
+                    </div>
+                  </div>
+                </div>
+
+                {exercicio.type==='triagem' && (
+                  <div className="space-y-3">
+                    <div className="text-[11px] font-black tracking-widest text-zinc-500 text-center flex items-center justify-center gap-2"><ChacMascot size={32} mood="grumpy"/> {exercicio.contexto} <GiraMascot size={32} mood="happy"/></div>
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <button disabled={!!resposta} onClick={()=>validar('triagem','chacal')} className={`text-left p-4 rounded-[20px] border-[3px] press flex gap-3 ${resposta?'border-zinc-200 opacity-60':'border-zinc-900 bg-[#FFECEE] shadow-[0_4px_0_#111] hover:brightness-105'}`}>
+                        <div className="shrink-0 hidden md:block"><ChacMascot size={48} mood="grumpy"/></div>
+                        <div><div className="inline-flex px-2.5 py-1 rounded-full bg-[#FF4B82] text-white game font-black text-[11px] border-2 border-zinc-900">🐺 CHACAL</div><div className="text-[14px] font-bold leading-snug mt-2">“{exercicio.chacal}”</div></div>
+                      </button>
+                      <button disabled={!!resposta} onClick={()=>validar('triagem','girafa')} className={`text-left p-4 rounded-[20px] border-[3px] press flex gap-3 ${resposta? (resposta==='correto'?'border-[#58CC02] bg-[#E6FFE1]':'border-zinc-200 opacity-60'):'bg-[#E6FFE1] border-zinc-900 shadow-[0_4px_0_#111] hover:brightness-105'}`}>
+                        <div className="shrink-0 hidden md:block"><GiraMascot size={48} mood="happy"/></div>
+                        <div><div className="inline-flex px-2.5 py-1 rounded-full bg-[#58CC02] text-white game font-black text-[11px] border-2 border-zinc-900">🦒 GIRAFA</div><div className="text-[14px] font-bold leading-snug mt-2">“{exercicio.girafa}”</div></div>
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {exercicio.type==='word_syntax' && (
+                  <div className="space-y-3">
+                    <div className="text-[12px] font-black text-zinc-500 text-center">Toque ↑ ↓ para ordenar</div>
+                    <div className="space-y-2">
+                      {dragOrder.map((b,i)=>(
+                        <div key={i} className="flex items-center gap-2 p-3 rounded-2xl bg-white border-[3px] border-zinc-900 shadow-[0_3px_0_#111]">
+                          <span className="w-8 h-8 rounded-xl bg-[#FFD900] border-2 border-zinc-900 flex items-center justify-center game font-black text-[12px]">{i+1}</span>
+                          <span className="text-[13px] font-bold flex-1 leading-snug">{b}</span>
+                          <div className="flex flex-col gap-1">
+                            <button disabled={i===0} onClick={()=>handleDrag(i,i-1)} className="w-7 h-7 rounded-lg bg-zinc-900 text-white disabled:opacity-30 press">↑</button>
+                            <button disabled={i===dragOrder.length-1} onClick={()=>handleDrag(i,i+1)} className="w-7 h-7 rounded-lg bg-zinc-900 text-white disabled:opacity-30 press">↓</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <button disabled={!!resposta} onClick={()=>validar('word_syntax',dragOrder)} className="w-full py-3.5 rounded-full game font-black text-[15px] text-white border-b-[5px] press bg-[#58CC02] border-[#46A302]">✨ VALIDAR FRASE</button>
+                  </div>
+                )}
+
+                {exercicio.type==='semiotica_bloqueios' && (
+                  <div className="grid gap-2 mt-3">
+                    {exercicio.options.map(o=>(
+                      <button key={o.label} disabled={!!resposta} onClick={()=>validar('semiotica_bloqueios',o.label)} className={`text-left p-3.5 rounded-2xl border-[3px] flex items-center justify-between press ${resposta?'bg-white border-zinc-200':'bg-white border-zinc-900 shadow-[0_3px_0_#111] hover:bg-zinc-50'}`}>
+                        <div><div className="game font-black text-[14px]">{o.label}</div>{o.desc && <div className="text-[11px] font-bold text-zinc-500">{o.desc}</div>}</div>
+                        <span className="w-8 h-8 rounded-full bg-[#FFD900] border-2 border-zinc-900 flex items-center justify-center game font-black">→</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {exercicio.type==='sinal_vs_juizo' && (
+                  <div className="grid md:grid-cols-2 gap-3 mt-3">
+                    <button disabled={!!resposta} onClick={()=>validar('sinal_vs_juizo','autentico')} className="p-4 rounded-[20px] bg-[#E6FFE1] border-[3px] border-zinc-900 text-left press shadow-[0_3px_0_#111]"><div className="game font-black text-[12px] text-[#46A302]">💚 SINAL VITAL</div><div className="text-[12px] font-bold text-zinc-700 mt-1">Emoção do corpo, sem culpar.</div></button>
+                    <button disabled={!!resposta} onClick={()=>validar('sinal_vs_juizo','pseudo')} className="p-4 rounded-[20px] bg-[#FFECEE] border-[3px] border-zinc-900 text-left press shadow-[0_3px_0_#111]"><div className="game font-black text-[12px] text-[#FF4B82]">💔 PSEUDO</div><div className="text-[12px] font-bold text-zinc-700 mt-1">Juízo disfarçado.</div></button>
+                  </div>
+                )}
+
+                {exercicio.type==='escuta_clinica' && (
+                  <div className="space-y-2 mt-3">
+                    {exercicio.options.map(o=>(
+                      <button key={o.label} disabled={!!resposta} onClick={()=>validar('escuta_clinica',o.label)} className={`w-full text-left p-4 rounded-[20px] border-[3px] press ${resposta?'bg-white border-zinc-200 opacity-70':'bg-white border-zinc-900 shadow-[0_3px_0_#111] hover:bg-zinc-50'}`}>
+                        <div className="text-[11px] font-black text-zinc-500">{o.label}</div><div className="text-[13px] font-bold mt-1">“{o.text}”</div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {showExp && (
+                  <div className={`mt-5 p-4 rounded-[20px] border-[3px] ${resposta==='correto'?'bg-[#E6FFE1] border-[#58CC02]':'bg-[#FFE8CC] border-[#FF9600]'}`}>
+                    <div className="flex items-center gap-2">
+                      <div className="shrink-0">{resposta==='correto'? <GiraMascot size={36} mood="celebrate"/> : <ChacMascot size={32} mood="sad"/>}</div>
+                      <div>
+                        <div className="game font-black text-[14px]">{resposta==='correto'?'BOA, GABI! +20 XP +5 💎':'QUASE LÁ!'}</div>
+                        <div className="text-[13px] font-bold leading-relaxed">{exercicio.exp}</div>
+                      </div>
+                    </div>
+                    <button onClick={proximo} className={`mt-3 w-full py-3 rounded-full game font-black text-white border-b-[4px] press ${resposta==='correto'?'bg-[#58CC02] border-[#46A302]':'bg-zinc-900 border-black'}`}>
+                      {exIdx<4?'PRÓXIMA →':'CONCLUIR MUNDO →'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {view==='triage' && (
+            <div className="bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden">
+              <div className="bg-[#1CB0F6] p-5 border-b-[3px] border-zinc-900 text-white flex gap-3 items-center">
+                <GiraMascot size={48} mood="happy"/>
+                <div><div className="game font-black text-[13px] tracking-widest">🔧 OFICINA DA GIRA</div><h2 className="game font-black text-[20px] leading-none">Crie seu Girafês real</h2></div>
+              </div>
+              <div className="p-5 space-y-4">
+                <div className="p-4 rounded-[20px] bg-zinc-50 border-[3px] border-zinc-900">
+                  <div className="game font-black text-[12px]">01 👀 O QUE ACONTECEU? (filmável)</div>
+                  <textarea value={triagem.situacao} onChange={e=>setTriagem({...triagem, situacao:e.target.value})} placeholder="Ex: vejo que a escala mudou sem me avisarem..." rows={2} className="mt-2 w-full p-3 rounded-2xl border-2 border-zinc-900 text-[13px] font-bold focus:outline-none"></textarea>
+                </div>
+                <div className="p-4 rounded-[20px] bg-[#E6FFE1] border-[3px] border-zinc-900">
+                  <div className="game font-black text-[12px] text-[#46A302]">02 💚 O QUE SINTO?</div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {[...SENTIMENTOS.naoAtendidas, ...SENTIMENTOS.atendidas].map(s=>(
+                      <button key={s} onClick={()=>{ beep(700,50); setTriagem({...triagem, sentimento:s});}} className={`px-3 py-1.5 rounded-full border-2 game font-black text-[11px] press ${triagem.sentimento===s?'bg-[#58CC02] text-white border-zinc-900 shadow-[0_2px_0_#111]':'bg-white border-zinc-900'}`}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="p-4 rounded-[20px] bg-[#F4F0FF] border-[3px] border-zinc-900">
+                  <div className="game font-black text-[12px] text-[#9A5CFF]">03 🌱 DO QUE PRECISO?</div>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {NECESSIDADES.map(n=>(
+                      <button key={n} onClick={()=>{ beep(600,50); setTriagem({...triagem, necessidade:n});}} className={`px-3 py-1.5 rounded-full border-2 game font-black text-[11px] press ${triagem.necessidade===n?'bg-[#9A5CFF] text-white border-zinc-900 shadow-[0_2px_0_#111]':'bg-white border-zinc-900'}`}>{n}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="p-4 rounded-[20px] bg-[#FFF4CC] border-[3px] border-zinc-900">
+                  <div className="game font-black text-[12px]">04 💌 PEDIDO CLARO?</div>
+                  <input value={triagem.pedido} onChange={e=>setTriagem({...triagem, pedido:e.target.value})} placeholder="Ex: me incluir na decisão até 18h e checar comigo?" className="mt-2 w-full p-3 rounded-2xl border-2 border-zinc-900 text-[13px] font-bold"/>
+                </div>
+                <div className="p-4 rounded-[20px] bg-zinc-900 text-white border-[3px] border-zinc-900">
+                  <div className="game font-black text-[12px] text-[#FFD900] flex items-center gap-2"><GiraMascot size={28} mood="happy"/> PRÉVIA GIRAFÊS</div>
+                  <div className="mt-2 bg-white/10 rounded-2xl p-4 border-2 border-white/20 text-[14px] font-bold leading-relaxed">
+                    {triagem.situacao||triagem.sentimento||triagem.necessidade||triagem.pedido ? `“Quando ${triagem.situacao||'___'}, sinto ${triagem.sentimento||'___'} porque preciso de ${triagem.necessidade||'___'}. Você poderia ${triagem.pedido||'___'}?”` : "Preencha os 4 blocos pra ver sua frase mágica aqui!"}
+                  </div>
+                  <div className="flex gap-2 mt-3">
+                    <button onClick={gerarGirafa} className="flex-1 py-3 rounded-full bg-[#FFD900] text-zinc-900 game font-black border-b-[4px] border-[#E5B700] press">💾 SALVAR +30 XP</button>
+                    <button onClick={()=>setTriagem({situacao:"",sentimento:"",necessidade:"",pedido:""})} className="px-5 py-3 rounded-full bg-white/10 border-2 border-white/20 game font-black">LIMPAR</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {view==='certificado' && (
+            <div className="bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden text-center">
+              <div className="h-2 w-full bg-gradient-to-r from-[#58CC02] via-[#1CB0F6] to-[#FFD900]"></div>
+              <div className="p-7 md:p-8">
+                <div className="mx-auto w-fit"><GiraMascot size={72} mood="celebrate"/></div>
+                <div className="game font-black text-[12px] tracking-widest text-zinc-500 mt-3">CERTIFICADO LENDÁRIO • 2026</div>
+                <h2 className="game font-black text-[30px] leading-none mt-1">Dra. Gabi <span className="text-[#58CC02]">zerou!</span></h2>
+                <p className="text-[12px] font-black text-zinc-500 mt-1">{Object.keys(completos).length}/40 fases • {progressoGeral}% • {xp} XP</p>
+                <div className="mt-5 p-5 rounded-[20px] bg-[#FFFBF0] border-[3px] border-zinc-900 text-left">
+                  <div className="game font-black text-[12px]">PARECER LENDÁRIO</div>
+                  <div className="text-[13px] font-bold leading-relaxed text-zinc-700 mt-1">Gabi percorreu os 8 mundos com brilho e precisão. Sabe observar sem julgar, nomear afetos, mapear necessidades, pedir com clareza, escutar sem consertar, regular fúria e celebrar com estrelinhas de ocitocina!</div>
+                </div>
+                <div className="mt-6 p-6 rounded-[24px] bg-zinc-900 text-white text-left border-[3px] border-zinc-900">
+                  <div className="text-[15px] font-bold leading-relaxed">“Para a Gabi, que me ensina a profundidade do cuidado. Que este game te acompanhe nos plantões, nas conversas difíceis e nos dias esquecidos — pra lembrar que escuta é poder. Com todo meu amor, <b className="text-[#FFD900]">Vinicius 💛</b>”</div>
+                </div>
+                <div className="mt-5 flex justify-center gap-2">
+                  <button onClick={()=>window.print()} className="px-6 py-3 rounded-full bg-[#58CC02] text-white game font-black border-b-[4px] border-[#46A302] press">🖨️ IMPRIMIR</button>
+                  <button onClick={()=>{setView('map'); setFaseAtiva(1); setExIdx(0);}} className="px-6 py-3 rounded-full bg-white border-[3px] border-zinc-900 game font-black press">REJOGAR</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="text-center text-[11px] font-black text-zinc-400 pb-4 flex items-center justify-center gap-1.5">feito com <GiraMascot size={18} mood="happy"/> por V. para G. • Fase 01: mascotes • som • baú • XP voando</div>
+        </section>
+      </main>
+
+      {toast && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50">
+          <div className="bg-zinc-900 text-white game font-black text-[13px] px-5 py-2.5 rounded-full border-[3px] border-zinc-900 shadow-[0_4px_0_#111] flex items-center gap-2 animate-pop"><span>✨</span>{toast}</div>
+        </div>
+      )}
+      <div className="lg:hidden h-10"></div>
+    </div>
+  );
+}
+const root=ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App/>);
+</script>
+</body>
+</html>
