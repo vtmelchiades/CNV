@@ -440,6 +440,11 @@ function App(){
     else { if(faseAtiva<8) { beep(700,100); setView('map'); showToastMsg("Mundo concluído!"); } else setView('certificado'); }
     setResposta(null); setShowExp(false);
   }
+  function pularExercicio(){
+    beep(320,90); showToastMsg("Pulado! ⏭️ Sem XP, mas segue o jogo 💛");
+    // não marca como completo, não perde vida, só avança
+    proximo();
+  }
   function handleDrag(from,to){ const a=[...dragOrder]; const [m]=a.splice(from,1); a.splice(to,0,m); setDragOrder(a); beep(500,40); }
   function onDragStart(e,i){ setDragIdx(i); try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain', String(i)); }catch(err){}; setTimeout(()=>{ try{ e.target.style.opacity='0.45'; }catch(e){} },0); }
   function onDragEnd(e){ try{ e.target.style.opacity='1'; }catch(e){} setDragIdx(null); setOverIdx(null); }
@@ -859,6 +864,7 @@ function App(){
               <div className="px-5 md:px-7 pt-5 pb-4 border-b-[3px] border-zinc-900 bg-zinc-50 flex items-center gap-3">
                 <button onClick={()=>setView('map')} className="w-9 h-9 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center press">←</button>
                 <div className="flex-1"><div className="h-3 bg-white rounded-full border-2 border-zinc-900 overflow-hidden p-1"><div className="h-full rounded-full transition-all" style={{width:`${((exIdx+1)/5)*100}%`, background: faseObj.color}}></div></div></div>
+                <button onClick={pularExercicio} className="game font-black text-[11px] px-3 py-1.5 rounded-full bg-white border-2 border-zinc-900 press hover:bg-zinc-50 flex items-center gap-1">⏭️ Pular</button>
                 <span className="game font-black text-[12px] bg-white border-2 border-zinc-900 px-2.5 py-1 rounded-full">❤️ {vidas}</span>
               </div>
 
@@ -954,6 +960,11 @@ function App(){
                   </div>
                 )}
 
+                {!showExp && !resposta && (
+                  <div className="mt-4 flex items-center justify-center">
+                    <button onClick={pularExercicio} className="text-[12px] font-black text-zinc-500 underline hover:text-zinc-700 press">⏭️ Pular este exercício (ver resposta sem ganhar XP)</button>
+                  </div>
+                )}
                 {showExp && (
                   <div className={`mt-5 p-4 rounded-[20px] border-[3px] ${resposta==='correto'?'bg-[#E6FFE1] border-[#58CC02]':'bg-[#FFE8CC] border-[#FF9600]'}`}>
                     <div className="flex items-center gap-2">
