@@ -47,14 +47,62 @@ body{ font-family:"Plus Jakarta Sans",system-ui,sans-serif; background:#FFFBF0; 
 <script type="text/babel">
 const {useState,useEffect,useMemo,useRef} = React;
 const FASES = [
-  {id:1, titulo:"O Coração da Escuta", subtitulo:"Presença & Intenção", code:"MUNDO 01", color:"#58CC02", dark:"#46A302", emoji:"💚", desc:"O primeiro poder da Gabi: sair do modo Chacal reativo e ligar o modo Girafa regulada.", nerdTitle:"Modulação Vagal vs Sequestro Amigdalar", nerdDesc:"Treino de freio vagal ventral. Simpático = chacal (coração acelerado). Parassimpático = girafa (escuta ampla)."},
-  {id:2, titulo:"O Olhar Semiótico", subtitulo:"Observação sem Avaliação", code:"MUNDO 02", color:"#1CB0F6", dark:"#0A91D4", emoji:"🔍", desc:"Separe a câmera do comentário. Veja o fato nu, sem legenda.", nerdTitle:"Anamnese sem viés", nerdDesc:"Descrever sem rotular — como semiologia pura."},
-  {id:3, titulo:"Sinais Vitais do Afeto", subtitulo:"Alfabetização Emocional", code:"MUNDO 03", color:"#FF9600", dark:"#D67E00", emoji:"💛", desc:"Sentimentos são sinais vitais. Aprenda a ler sua termometria interna.", nerdTitle:"Termometria Interoceptiva", nerdDesc:"Nomear o afeto com precisão regula a amígdala."},
-  {id:4, titulo:"A Fisiologia das Necessidades", subtitulo:"Inventário Vital", code:"MUNDO 04", color:"#9A5CFF", dark:"#7A3DCC", emoji:"🌱", desc:"Por trás de toda emoção vive uma necessidade universal tentando respirar.", nerdTitle:"Homeostase Psíquica", nerdDesc:"7 eixos de Rosenberg = necessidades homeostáticas."},
-  {id:5, titulo:"A Posologia do Pedido", subtitulo:"Clareza de Ação", code:"MUNDO 05", color:"#FF4B82", dark:"#D93A68", emoji:"💌", desc:"Transforme exigência em pedido claro, dosável e cheio de escolha.", nerdTitle:"Prescrição de Ação Positiva", nerdDesc:"Pedido com posologia: verbo + dose + verificação."},
-  {id:6, titulo:"Escuta Desarmada", subtitulo:"Empatia Radical", code:"MUNDO 06", color:"#00D1A0", dark:"#00A87F", emoji:"👂", desc:"80% da cura acontece quando você só escuta — sem consertar.", nerdTitle:"Ausculta Empática", nerdDesc:"Presença sem conselho = co-regulação."},
-  {id:7, titulo:"Modulação da Fúria", subtitulo:"Raiva e Força Protetora", code:"MUNDO 07", color:"#FF3B30", dark:"#CC2F26", emoji:"🔥", desc:"Raiva é bússola. Força que protege ≠ força que pune.", nerdTitle:"Citocinas vs Regulação", nerdDesc:"Raiva acolhida não inflama; punição iatrogênica sim."},
-  {id:8, titulo:"Circuito da Gratidão", subtitulo:"Celebrar e Vincular", code:"MUNDO 08", color:"#FFD900", dark:"#E5B700", emoji:"⭐", desc:"Celebre com precisão e libere ocitocina em quem te cerca.", nerdTitle:"Reforço Ocitocinérgico", nerdDesc:"Gratidão específica = dopamina + confiança."},
+  {id:1, titulo:"O Coração da Escuta", subtitulo:"Presença & Intenção", code:"MUNDO 01", color:"#58CC02", dark:"#46A302", emoji:"💚", desc:"O primeiro poder da Gabi: sair do modo Chacal reativo e ligar o modo Girafa regulada.",
+    nerdTitle:"Teoria Polivagal — Freio Vagal Ventral vs Sequestro Amigdalar",
+    nerdDesc:"Treino de tônus vagal mielinizado (vago ventral). Simpático = Chacal (alerta). Parassimpático ventral = Girafa (conexão). Janela de tolerância de Siegel.",
+    nerdMecanismo:"Porges (2011): vago ventral freia o coração via acetilcolina → ↑ VFC (RMSSD) → córtex pré-frontal stays online. Sem freio, amígdala 'sequestra' (Goleman) → HHA dispara cortisol/noradrenalina → escuta colapsa. 3 respirações diafragmáticas (expiração longa) restauram freio em 45-60s. HRV é biomarcador de prontidão relacional.",
+    nerdClinico:"Antes de dar má notícia ou entrar em discussão pós-plantão: pés no chão + exalação 6s. Em código, quem regula primeiro co-regula a equipe. Gabi pode medir: FC cai 8-12 bpm quando no modo girafa.",
+    nerdRef:"Porges SW. Polyvagal Theory 2011 • Siegel DJ. Window of Tolerance • Laborde 2017 HRV & emotion regulation • Goleman Amygdala Hijack",
+    nerdBiomarcador:"📈 VFC (RMSSD ↑), FC ↓, cortisol salivar ↓, alfa-amilase ↓"},
+  {id:2, titulo:"O Olhar Semiótico", subtitulo:"Observação sem Avaliação", code:"MUNDO 02", color:"#1CB0F6", dark:"#0A91D4", emoji:"🔍", desc:"Separe a câmera do comentário. Veja o fato nu, sem legenda.",
+    nerdTitle:"Semiologia Pura — Sistema 1 vs Sistema 2 (Kahneman)",
+    nerdDesc:"Descrever sem rotular é treino de Sistema 2 (lento, pré-frontal). Rótulo 'folgado' é Sistema 1 (rápido, amígdala).",
+    nerdMecanismo:"Córtex pré-frontal dorsolateral inibe inferência rápida da amígdala/ínsula. Viés de confirmação + efeito halo fazem ver 'caráter' onde há comportamento pontual. Treinar 'câmera' (o que seria filmável?) fortalece metacognição e reduz erro diagnóstico / erro de atribuição.",
+    nerdClinico:"No prontuário: troque 'paciente agressivo/difícil' por 'paciente gritou, puxou acesso às 14h12, após 6h em jejum'. Descreve sem colar legenda. Na passagem: '2 dias sem evolução LEITO 303' une; 'você é folgado' separa. Mesma lógica da semiologia: descreva sopro antes de nomear valvopatia.",
+    nerdRef:"Kahneman D. Thinking Fast & Slow • Gawande A. Checklist • Croskerry P. Cognitive bias in clinical reasoning 2013",
+    nerdBiomarcador:"🧠 Ativação CPF-DL ↑, julgamento moral ↓ (fMRI: Lieberman)"},
+  {id:3, titulo:"Sinais Vitais do Afeto", subtitulo:"Alfabetização Emocional", code:"MUNDO 03", color:"#FF9600", dark:"#D67E00", emoji:"💛", desc:"Sentimentos são sinais vitais. Aprenda a ler sua termometria interna.",
+    nerdTitle:"Interocepção & Affect Labeling — A Ínsula Decide",
+    nerdDesc:"Sentimento mora na ínsula anterior (mapa do corpo). Nomear reduz amígdala ~30-50%.",
+    nerdMecanismo:"Barrett (constructivismo): emoção = predição interoceptiva. Ínsula + córtex somatossensorial leem batimento, respiração, tensão. Alexitimia = déficit interoceptivo → somatização, burnout. Lieberman 2007: rotular 'estou ansiosa' (affect labeling) ↓ amígdala e ↑ CPF ventrolateral. Pseudo-sentimento ('traída', 'manipulada') não regula pois acusa o outro, não descreve corpo.",
+    nerdClinico:"Gabi: confunda 'sinto que fui descartada' (leitura mental) com 'sinto tristeza + aperto no peito' (sinal vital). O primeiro pede defesa do outro; o segundo pede cuidado. Pergunte sempre: onde sinto no corpo? Qual a intensidade 0-10? Isso é semiologia afetiva.",
+    nerdRef:"Barrett LF. How Emotions Are Made 2017 • Lieberman MD. Putting feelings into words 2007 • Critchley & Garfinkel Interoception 2017",
+    nerdBiomarcador:"💓 Coerência interoceptiva, atividade insular anterior, VFC"},
+  {id:4, titulo:"A Fisiologia das Necessidades", subtitulo:"Inventário Vital", code:"MUNDO 04", color:"#9A5CFF", dark:"#7A3DCC", emoji:"🌱", desc:"Por trás de toda emoção vive uma necessidade universal tentando respirar.",
+    nerdTitle:"Homeostase Psíquica — Autodeterminação & Alostase",
+    nerdDesc:"Rosenberg lista 7 eixos = nutrientes psíquicos. Negados, viram carga alostática.",
+    nerdMecanismo:"McEwen: alostase = manter estabilidade através da mudança. Necessidade insatisfeita cronicamente → alostase vira carga alostática → eixo HHA ↑ cortisol, ↑ IL-6, ↓ imunidade. Teoria da Autodeterminação (Deci & Ryan): autonomia, competência e vínculo são necessidades 'vitaminas'. Confundir necessidade (universal: 'preciso descanso') com estratégia ('preciso que VOCÊ fique') gera dependência e conflito.",
+    nerdClinico:"Troque 'sou obrigada pela chefia' (negação de responsabilidade → cortisol) por 'escolho cobrir porque preciso de segurança financeira e colaboração' (custo claro, lócus interno). Decisão com lócus interno ↓ burnout (Maslach). Pergunta chave: do que preciso que todo humano precisa quando sente isso?",
+    nerdRef:"McEwen & Stellar Allostatic Load 1993 • Deci & Ryan Self-Determination Theory • Maslach Burnout Inventory",
+    nerdBiomarcador:"🧪 Cortisol, IL-6, carga alostática, escala de bem-estar (WHO-5)"},
+  {id:5, titulo:"A Posologia do Pedido", subtitulo:"Clareza de Ação", code:"MUNDO 05", color:"#FF4B82", dark:"#D93A68", emoji:"💌", desc:"Transforme exigência em pedido claro, dosável e cheio de escolha.",
+    nerdTitle:"Prescrição de Ação — Posologia Relacional (SMART)",
+    nerdDesc:"Pedido = prescrição com verbo observável + dose + tempo + checagem de consentimento.",
+    nerdMecanismo:"Pedido vago ('seja mais atencioso') ativa incerteza → amígdala. Pedido SMART (específico, mensurável, acordável) ativa CPF e sistema de recompensa por previsibilidade. Rosenberg: pedido preserva autonomia (pode dizer não); exigência pune o não → medo, compliance falso. Linguagem observável é 'dose' (ex: '2 min sem interromper').",
+    nerdClinico:"Use OFNP como receita: Quando... [obs. filmável] + sinto... [sinal vital] + porque preciso... [necessidade] + você poderia... [verbo + quando + confirma?]. Sempre feche com 'faz sentido? consegue? o que acha?'. No hospital: 'Pode higienizar agora antes do leito e me avisar?' > 'Higienizem as mãos!' (ordem → reatância).",
+    nerdRef:"Rosenberg MB. Nonviolent Communication • Cialdini Influence (reatância) • SMART goals (Doran)",
+    nerdBiomarcador:"📋 Taxa de adesão ao pedido, clareza percebida (Likert)"},
+  {id:6, titulo:"Escuta Desarmada", subtitulo:"Empatia Radical", code:"MUNDO 06", color:"#00D1A0", dark:"#00A87F", emoji:"👂", desc:"80% da cura acontece quando você só escuta — sem consertar.",
+    nerdTitle:"Co-regulação & Neurônios-Espelho — A Ausculta que Cura",
+    nerdDesc:"Presença sem conselho = ocitocina. Conselho prematuro = cortisol.",
+    nerdMecanismo:"Cozolino/Miller: escuta empática ativa neurônios-espelho + sistema de mentalização (junção temporo-parietal) + libera ocitocina (vínculo) e ↓ cortisol do falante em ~15-20%. Rogers: 'presença incondicional' é fator comum que prediz 30% do outcome terapêutico. Bloqueios (conselho, consolo genérico, interrogatório, história própria) roubam agência.",
+    nerdClinico:"Fórmula: 'Parece [sentimento] e [sentimento], precisando de [necessidade]? É isso?' + silêncio 4s. Não complete. Cheque: 'é isso que tá vivo aí?'. No pronto-socorro, 90s de escuta reflexiva ↑ satisfação e adesão sem aumentar tempo total (Levinson 2000).",
+    nerdRef:"Rogers CR. Client-Centered Therapy • Cozolino The Neuroscience of Psychotherapy • Levinson 2000 Listening",
+    nerdBiomarcador:"🤝 Ocitocina ↑, cortisol ↓, aliança terapêutica (WAI)"},
+  {id:7, titulo:"Modulação da Fúria", subtitulo:"Raiva e Força Protetora", code:"MUNDO 07", color:"#FF3B30", dark:"#CC2F26", emoji:"🔥", desc:"Raiva é bússola. Força que protege ≠ força que pune.",
+    nerdTitle:"Circuito da Raiva — Noradrenalina, HHA & Ética da Contenção",
+    nerdDesc:"Raiva = alarme de necessidade bloqueada + energia para proteger. Suprimida inflama; acolhida desinflama.",
+    nerdMecanismo:"Panksepp: sistema RAGE (amígdala medial, hipotálamo, PAG) → descarga simpática: noradrenalina, ↑ PA, midríase. Se narra como 'você me fez' → mantém HHA ligado → IL-6 ↑, risco CV. Reappraisal ('preciso de respeito') recruta CPF ventromedial → ↓ amígdala. Força protetora (Restraint ética) = conter dano sem intenção de sofrimento; punitiva = infligir sofrimento para 'ensinar' → trauma, quebra de vínculo, iatrogenia.",
+    nerdClinico:"Na agitação psicomotora: proteja (contenção com cuidado, explica, monitora) + valide ('parece com muita raiva e medo, precisando de segurança?') depois técnica. Pós-evento, debrief com equipe: onde estava minha necessidade de justiça/segurança? Isso evita 'contenção pedagógica'.",
+    nerdRef:"Panksepp Affective Neuroscience • Lerner & Tiedens 2006 Mad vs Fear • CFM Resolução 1.644 contenção",
+    nerdBiomarcador:"🔥 Noradrenalina, PA, IL-6, tempo de contenção, escala RASS"},
+  {id:8, titulo:"Circuito da Gratidão", subtitulo:"Celebrar e Vincular", code:"MUNDO 08", color:"#FFD900", dark:"#E5B700", emoji:"⭐", desc:"Celebre com precisão e libere ocitocina em quem te cerca.",
+    nerdTitle:"Reforço Ocitocinérgico — Dopamina do Pertencimento",
+    nerdDesc:"Gratidão específica = dopamina + ocitocina + serotonina. Genérica não vicia.",
+    nerdMecanismo:"Emmons & McCullough: 3 semanas de gratidão específica ↑ bem-estar 25% e ↓ burnout. Neuro: gratidão ativa estriado ventral (dopamina) + hipotálamo (ocitocina) + CPF medial (sentido). Comparação ('melhor que todos') ativa ameaça social, mesmo elogiando. Celebração OFNP: fato + sentimento + necessidade atendida + impacto concreto fecha loop de recompensa e consolida vínculo.",
+    nerdClinico:"Pós-reanimação: 'Quando estabilizamos juntos 40min, sinto gratidão/orgulho porque preciso de cooperação e propósito — seu cuidado no leito 3 fez diferença' > 'valeu, foi ótimo'. Escreva 1 gratidão específica por plantão. Protege contra despersonalização (Maslach).",
+    nerdRef:"Emmons & McCullough 2003 •Algoe 2012 other-praising • Maslach Burnout • Fredrickson Broaden-and-Build",
+    nerdBiomarcador:"⭐ Ocitocina, dopamina, escore de gratidão (GQ-6), vínculo equipe"},
 ];
 
 const AULAS = {
@@ -266,6 +314,9 @@ function App(){
   const [shake,setShake]=useState(false);
   const [pulse,setPulse]=useState(false);
   const [dragOrder,setDragOrder]=useState([]);
+  const [dragIdx,setDragIdx]=useState(null);
+  const [overIdx,setOverIdx]=useState(null);
+  const [nerdExpand,setNerdExpand]=useState(false);
   const [triagem,setTriagem]=useState({situacao:"", sentimento:"", necessidade:"", pedido:""});
   const [diario,setDiario]=useState([]);
   const [toast,setToast]=useState(null);
@@ -336,7 +387,7 @@ function App(){
       if(JSON.stringify(arr)===JSON.stringify(exercicio.blocksCorrect)) [arr[0],arr[1]]=[arr[1],arr[0]];
       setDragOrder(arr);
     }
-    setResposta(null); setShowExp(false); setShake(false);
+    setResposta(null); setShowExp(false); setShake(false); setDragIdx(null); setOverIdx(null);
   },[exercicio?.id]);
 
   function showToastMsg(m){ setToast(m); setTimeout(()=>setToast(null),2400); }
@@ -390,6 +441,26 @@ function App(){
     setResposta(null); setShowExp(false);
   }
   function handleDrag(from,to){ const a=[...dragOrder]; const [m]=a.splice(from,1); a.splice(to,0,m); setDragOrder(a); beep(500,40); }
+  function onDragStart(e,i){ setDragIdx(i); try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain', String(i)); }catch(err){}; setTimeout(()=>{ try{ e.target.style.opacity='0.45'; }catch(e){} },0); }
+  function onDragEnd(e){ try{ e.target.style.opacity='1'; }catch(e){} setDragIdx(null); setOverIdx(null); }
+  function onDragOver(e,i){ e.preventDefault(); if(dragIdx===null || dragIdx===i) return; setOverIdx(i); }
+  function onDrop(e,i){ e.preventDefault(); if(dragIdx===null) return; const a=[...dragOrder]; const [m]=a.splice(dragIdx,1); a.splice(i,0,m); setDragOrder(a); beep(500,40); setDragIdx(null); setOverIdx(null); }
+  function handleTouchMove(e){
+    const touch = e.touches[0];
+    if(dragIdx===null || !touch) return;
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const card = el && el.closest ? el.closest('[data-idx]') : null;
+    if(card){
+      const idx = parseInt(card.getAttribute('data-idx'),10);
+      if(!isNaN(idx) && idx!==dragIdx) setOverIdx(idx);
+    }
+  }
+  function handleTouchEnd(){
+    if(dragIdx!==null && overIdx!==null && overIdx!==dragIdx){
+      const a=[...dragOrder]; const [m]=a.splice(dragIdx,1); a.splice(overIdx,0,m); setDragOrder(a); beep(500,40);
+    }
+    setDragIdx(null); setOverIdx(null);
+  }
   function gerarGirafa(){
     if(!triagem.situacao||!triagem.sentimento||!triagem.necessidade||!triagem.pedido){ beep(200,120); showToastMsg("Preencha os 4 blocos!"); return; }
     const texto=`Quando ${triagem.situacao}, sinto ${triagem.sentimento} porque preciso de ${triagem.necessidade}. Você poderia ${triagem.pedido}?`;
@@ -441,7 +512,7 @@ function App(){
             </div>
             <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-[#E6F7FF] border-2 border-zinc-900 game font-black text-[#1CB0F6] text-[13px]"><span>💎</span> {gems}</div>
             <button onClick={()=>setMuted(m=>!m)} className="w-9 h-9 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center press text-[14px]">{muted?'🔇':'🔊'}</button>
-            <button onClick={()=>setNerd(v=>!v)} className={`hidden md:inline-flex game font-black text-[11px] px-3 py-1.5 rounded-full border-2 press ${nerd?'bg-[#9A5CFF] text-white border-zinc-900 shadow-3d-purple':'bg-white text-zinc-500 border-zinc-200'}`}>🧬 {nerd?'ON':'OFF'}</button>
+            <button onClick={()=>{setNerd(v=>!v); if(!nerd) setNerdExpand(true); beep(700,60);}} className={`inline-flex game font-black text-[11px] px-3 py-1.5 rounded-full border-2 press ${nerd?'bg-[#9A5CFF] text-white border-zinc-900 shadow-3d-purple animate-pop':'bg-white text-zinc-700 border-zinc-900 shadow-[0_2px_0_#111]'}`}>🧬 {nerd?'NERD ON':'🧬 NERD'}</button>
           </div>
         </div>
         <div className="h-2.5 bg-zinc-100 border-t border-zinc-900"><div className="h-full bg-[#58CC02] transition-all" style={{width:`${progressoGeral}%`}}></div></div>
@@ -657,9 +728,47 @@ function App(){
                   </div>
                   <p className="text-[14px] font-medium text-zinc-600 leading-relaxed mt-4">{faseObj.desc}</p>
                   {nerd && (
-                    <div className="mt-4 p-4 rounded-2xl bg-[#F4F0FF] border-2 border-zinc-900">
-                      <div className="game font-black text-[12px] text-[#9A5CFF]">🧬 {faseObj.nerdTitle}</div>
-                      <div className="text-[13px] font-medium text-zinc-700 mt-1">{faseObj.nerdDesc}</div>
+                    <div className="mt-4 rounded-[20px] border-[3px] border-zinc-900 overflow-hidden shadow-[0_4px_0_#111]">
+                      <div className="bg-[#9A5CFF] p-3 flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="w-8 h-8 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center text-[14px]">🧬</span>
+                          <div>
+                            <div className="game font-black text-[11px] tracking-widest text-white/90">MODO NERD • PARA A DRA. GABI</div>
+                            <div className="game font-black text-[13px] text-white leading-none">{faseObj.nerdTitle}</div>
+                          </div>
+                        </div>
+                        <button onClick={()=>setNerdExpand(v=>!v)} className="w-8 h-8 rounded-full bg-white border-2 border-zinc-900 flex items-center justify-center game font-black text-[12px] press">{nerdExpand?'−':'+'}</button>
+                      </div>
+                      <div className="p-3.5 bg-[#F4F0FF]">
+                        <div className="text-[13px] font-bold leading-relaxed text-zinc-700">{faseObj.nerdDesc}</div>
+                        {nerdExpand && (
+                          <div className="mt-3 space-y-2.5 animate-pop">
+                            <div className="p-3 rounded-2xl bg-white border-2 border-zinc-900">
+                              <div className="game font-black text-[11px] tracking-widest text-[#9A5CFF] flex items-center gap-1">🧠 MECANISMO NEURAL</div>
+                              <div className="text-[12.5px] font-medium leading-relaxed text-zinc-700 mt-1">{faseObj.nerdMecanismo}</div>
+                            </div>
+                            <div className="p-3 rounded-2xl bg-[#E6FFE1] border-2 border-zinc-900">
+                              <div className="game font-black text-[11px] tracking-widest text-[#46A302] flex items-center gap-1">🏥 NA PRÁTICA DA GABI</div>
+                              <div className="text-[12.5px] font-bold leading-relaxed text-zinc-700 mt-1">{faseObj.nerdClinico}</div>
+                            </div>
+                            <div className="grid md:grid-cols-2 gap-2.5">
+                              <div className="p-3 rounded-2xl bg-[#FFF4CC] border-2 border-zinc-900">
+                                <div className="game font-black text-[11px] tracking-widest text-[#B89A00]">📈 BIOMARCADOR</div>
+                                <div className="text-[12px] font-bold mt-1">{faseObj.nerdBiomarcador}</div>
+                              </div>
+                              <div className="p-3 rounded-2xl bg-white border-2 border-zinc-900">
+                                <div className="game font-black text-[11px] tracking-widest text-zinc-500">📚 LEITURA RÁPIDA</div>
+                                <div className="text-[11px] font-bold leading-snug text-zinc-600 mt-1">{faseObj.nerdRef}</div>
+                              </div>
+                            </div>
+                            <div className="p-2.5 rounded-full bg-zinc-900 text-white flex items-center justify-between">
+                              <span className="text-[11px] font-black px-2">💡 DICA DE PROVA: cai em prova de residência?</span>
+                              <span className="text-[11px] font-bold bg-white text-zinc-900 px-2.5 py-1 rounded-full">Sim — regulação = segurança do paciente</span>
+                            </div>
+                          </div>
+                        )}
+                        {!nerdExpand && <button onClick={()=>setNerdExpand(true)} className="mt-2 w-full py-2 rounded-full bg-white border-2 border-zinc-900 game font-black text-[11px] press">+ Ver mecanismo, biomarcador e refs</button>}
+                      </div>
                     </div>
                   )}
                   <div className="mt-5 flex flex-wrap gap-2">
@@ -699,13 +808,42 @@ function App(){
               <div className="grid md:grid-cols-2 gap-3">
                 <div className="bg-[#1CB0F6] rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] p-5 text-white">
                   <div className="game font-black flex items-center gap-2"><GiraMascot size={28} mood="happy"/> Como jogar?</div>
-                  <div className="text-[13px] font-bold mt-2 leading-relaxed">1️⃣ Escolha Girafa vs Chacal<br/>2️⃣ Ordene blocos OFNP<br/>3️⃣ Desmascare bloqueios<br/>4️⃣ Cerque com empatia</div>
+                  <div className="text-[13px] font-bold mt-2 leading-relaxed">1️⃣ Escolha Girafa vs Chacal<br/>2️⃣ Ordene blocos OFNP<br/>3️⃣ Desmascare bloqueios (arraste!)<br/>4️⃣ Cerque com empatia</div>
                 </div>
                 <div className="bg-zinc-900 rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] p-5 text-white">
                   <div className="game font-black text-[#FFD900]">💌 Para a Gabi</div>
                   <div className="text-[13px] font-medium leading-relaxed mt-2 text-zinc-100">“Cada fase é um treino de coração. 1% mais girafa a cada jogada.”</div>
                 </div>
               </div>
+              {nerd && (
+                <div className="bg-[#F4F0FF] rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] overflow-hidden">
+                  <div className="bg-[#9A5CFF] p-4 flex items-center gap-3 border-b-[3px] border-zinc-900">
+                    <div className="w-10 h-10 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center text-[18px]">📚</div>
+                    <div className="text-white"><div className="game font-black text-[11px] tracking-widest opacity-90">BIBLIOTECA NERD DA DRA. GABI</div><div className="game font-black text-[16px] leading-none">Fisiologia da Conexão — cheat-sheet</div></div>
+                    <span className="ml-auto hidden md:inline bg-white text-[#9A5CFF] game font-black text-[10px] px-2.5 py-1 rounded-full border-2 border-zinc-900">8 MUNDOS • MECANISMOS</span>
+                  </div>
+                  <div className="p-4 grid md:grid-cols-2 gap-3">
+                    {FASES.map(f=>(
+                      <div key={f.id} className="p-3 rounded-2xl bg-white border-2 border-zinc-900">
+                        <div className="flex items-center gap-2">
+                          <span className="w-7 h-7 rounded-full border-2 border-zinc-900 flex items-center justify-center text-[12px] shrink-0" style={{background:f.color}}>{f.emoji}</span>
+                          <span className="game font-black text-[11px] leading-none">{f.code} • {f.titulo}</span>
+                        </div>
+                        <div className="text-[11px] font-bold text-[#9A5CFF] mt-1">{f.nerdTitle}</div>
+                        <div className="text-[11px] font-medium leading-snug text-zinc-600 mt-1" style={{display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden'}}>{f.nerdMecanismo.slice(0,130)}…</div>
+                        <div className="text-[10px] font-black mt-1.5 bg-[#FFF4CC] inline-block px-2 py-0.5 rounded-full border border-zinc-900">{f.nerdBiomarcador}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="px-4 pb-4">
+                    <div className="p-3 rounded-2xl bg-zinc-900 text-white">
+                      <div className="game font-black text-[11px] tracking-widest text-[#FFD900]">🧪 COMO USAR NA ROTINA DE PLANTÃO</div>
+                      <div className="text-[12px] font-bold leading-relaxed mt-1.5">• <b>30s pré-conversa difícil:</b> respiração 4-6 (ativa vago). • <b>Prontuário:</b> descreva sem rótulo. • <b>Check-in corporal:</b> onde sinto? (ínsula). • <b>Decisão:</b> lócus interno (“escolho porque preciso...”). • <b>Pedido:</b> feche com checagem. • <b>Debrief:</b> celebre 1 fato específico por turno → ocitocina + evita burnout.</div>
+                      <div className="text-[10px] font-bold text-zinc-400 mt-2">Refs rápidas: Porges 2011 • Lieberman 2007 • Barrett 2017 • McEwen 1993 • Deci & Ryan • Emmons 2003 • Levinson 2000 — guarde este card, Gabi!</div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
@@ -760,20 +898,31 @@ function App(){
 
                 {exercicio.type==='word_syntax' && (
                   <div className="space-y-3">
-                    <div className="text-[12px] font-black text-zinc-500 text-center">Toque ↑ ↓ para ordenar</div>
-                    <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="text-[11px] font-black tracking-widest text-zinc-500 flex items-center gap-1.5"><span className="w-6 h-6 rounded-lg bg-[#FFD900] border-2 border-zinc-900 flex items-center justify-center game font-black">↕</span> ARRASTE PARA ORDENAR</div>
+                      <span className="text-[11px] font-bold text-zinc-400 hidden md:inline">clique e arraste • toque e arraste • ou use ↑↓</span>
+                      <span className="text-[11px] font-bold text-zinc-400 md:hidden">arraste ↕</span>
+                    </div>
+                    <div className="space-y-2.5 touch-manipulation" onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}>
                       {dragOrder.map((b,i)=>(
-                        <div key={i} className="flex items-center gap-2 p-3 rounded-2xl bg-white border-[3px] border-zinc-900 shadow-[0_3px_0_#111]">
-                          <span className="w-8 h-8 rounded-xl bg-[#FFD900] border-2 border-zinc-900 flex items-center justify-center game font-black text-[12px]">{i+1}</span>
-                          <span className="text-[13px] font-bold flex-1 leading-snug">{b}</span>
-                          <div className="flex flex-col gap-1">
-                            <button disabled={i===0} onClick={()=>handleDrag(i,i-1)} className="w-7 h-7 rounded-lg bg-zinc-900 text-white disabled:opacity-30 press">↑</button>
-                            <button disabled={i===dragOrder.length-1} onClick={()=>handleDrag(i,i+1)} className="w-7 h-7 rounded-lg bg-zinc-900 text-white disabled:opacity-30 press">↓</button>
+                        <div key={b} data-idx={i} draggable={!resposta} onDragStart={(e)=>onDragStart(e,i)} onDragEnd={onDragEnd} onDragOver={(e)=>onDragOver(e,i)} onDrop={(e)=>onDrop(e,i)} onTouchStart={()=>{if(!resposta) setDragIdx(i);}} className={`group flex items-center gap-2.5 p-3 rounded-[18px] border-[3px] select-none ${dragIdx===i?'opacity-40 scale-[0.98] border-dashed bg-[#FFF4CC]': overIdx===i?'bg-[#E6FFE1] border-[#58CC02] scale-[1.01] shadow-[0_6px_0_#46A302]':'bg-white border-zinc-900 shadow-[0_3px_0_#111]'} ${resposta?'opacity-60':''} ${dragIdx===null?'press hover:brightness-[0.98]':''}`} style={{touchAction:'none'}}>
+                          <div className={`w-9 h-9 rounded-xl border-2 border-zinc-900 flex items-center justify-center game font-black text-[13px] shrink-0 ${i===0?'bg-[#1CB0F6] text-white':i===1?'bg-[#FF9600] text-white':i===2?'bg-[#9A5CFF] text-white':'bg-[#58CC02] text-white'}`}>{i+1}</div>
+                          <span className="text-[13.5px] font-extrabold flex-1 leading-snug tracking-tight">{b}</span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <div className={`hidden md:flex w-9 h-9 rounded-xl bg-zinc-900 text-white items-center justify-center cursor-grab active:cursor-grabbing border-2 border-zinc-900 ${dragIdx===i?'bg-[#58CC02]':''}`} title="arraste">≡</div>
+                            <div className="flex flex-col gap-1">
+                              <button disabled={!!resposta || i===0} onClick={()=>handleDrag(i,i-1)} className="w-8 h-8 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center game font-black text-[12px] disabled:opacity-20 press hover:bg-zinc-50" aria-label="mover para cima">↑</button>
+                              <button disabled={!!resposta || i===dragOrder.length-1} onClick={()=>handleDrag(i,i+1)} className="w-8 h-8 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center game font-black text-[12px] disabled:opacity-20 press hover:bg-zinc-50" aria-label="mover para baixo">↓</button>
+                            </div>
                           </div>
                         </div>
                       ))}
                     </div>
-                    <button disabled={!!resposta} onClick={()=>validar('word_syntax',dragOrder)} className="w-full py-3.5 rounded-full game font-black text-[15px] text-white border-b-[5px] press bg-[#58CC02] border-[#46A302]">✨ VALIDAR FRASE</button>
+                    <div className="flex items-center gap-2">
+                      <button disabled={!!resposta} onClick={()=>{const a=[...exercicio.blocksCorrect]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} if(JSON.stringify(a)===JSON.stringify(exercicio.blocksCorrect))[a[0],a[1]]=[a[1],a[0]]; setDragOrder(a); beep(300,50);}} className="px-4 py-2.5 rounded-full bg-white border-2 border-zinc-900 game font-black text-[11px] press flex items-center gap-1">🔀 Embaralhar</button>
+                      <button disabled={!!resposta} onClick={()=>validar('word_syntax',dragOrder)} className="flex-1 py-3.5 rounded-full game font-black text-[15px] text-white border-b-[5px] press bg-[#58CC02] border-[#46A302] shadow-[0_3px_0_#111] hover:brightness-105">✨ VALIDAR FRASE</button>
+                    </div>
+                    <div className="text-center text-[10px] font-black tracking-widest text-zinc-400">ORDEM CORRETA: 🔵 OBS → 🟡 SENT → 🟢 NEC → 🟣 PEDIDO</div>
                   </div>
                 )}
 
@@ -812,17 +961,28 @@ function App(){
                       <div>
                         <div className="game font-black text-[14px]">{resposta==='correto'?'BOA, GABI! +20 XP +5 💎':'QUASE LÁ!'}</div>
                         <div className="text-[13px] font-bold leading-relaxed">{exercicio.exp}</div>
-                        <div className="mt-3 p-3 rounded-xl bg-white/70 border-2 border-zinc-900/10">
-                          <div className="text-[11px] font-black tracking-widest text-zinc-500">🔍 POR QUE FUNCIONA?</div>
-                          <div className="text-[12px] font-bold leading-relaxed mt-1">
-                            {exercicio.type==='triagem' && "Chacal julga caráter e ativa defesa. Girafa separa fato de história e revela necessidade — o outro consegue ouvir sem se defender."}
-                            {exercicio.type==='word_syntax' && "OFNP na ordem certa evita que o outro ouça crítica. Observar → sentir → precisar → pedir mantém o córtex pré-frontal ligado."}
-                            {exercicio.type==='semiotica_bloqueios' && "Esses 4 bloqueios são 'ruídos' que impedem conexão. Nomear o ruído já desarma 50% dele."}
-                            {exercicio.type==='sinal_vs_juizo' && "Nomear sentimento real regula amígdala (affect labeling). Pseudo-sentimento soa como acusação e escala conflito."}
-                            {exercicio.type==='escuta_clinica' && "Conselho rouba autonomia. Empatia devolve. Refletir sentimento+necessidade faz a pessoa se sentir vista — 80% da resolução."}
+                        <div className="mt-3 p-3 rounded-2xl bg-white border-[3px] border-zinc-900">
+                          <div className="text-[11px] font-black tracking-widest text-zinc-500 flex items-center gap-1.5"><span className="w-5 h-5 rounded-full bg-[#FFD900] border-2 border-zinc-900 flex items-center justify-center text-[10px]">🔍</span> POR QUE FUNCIONA? <span className="ml-auto text-[10px] bg-zinc-900 text-white px-2 py-0.5 rounded-full">OFNP</span></div>
+                          <div className="text-[12.5px] font-bold leading-relaxed mt-2">
+                            {exercicio.type==='triagem' && "Chacal julga caráter ('você é irresponsável') → ativa defesa e eixo simpático do outro. Girafa separa fato filmável + sinal corporal + necessidade universal + pedido concreto → o outro consegue ouvir sem se defender, porque não foi atacado."}
+                            {exercicio.type==='word_syntax' && "OFNP na ordem certa evita que o outro ouça crítica. Observar (câmera) → Sentir (corpo) → Precisar (vitamina) → Pedir (posologia) mantém o córtex pré-frontal ligado e o sistema de ameaça desligado."}
+                            {exercicio.type==='semiotica_bloqueios' && "Esses 4 bloqueios são 'ruídos semióticos' que impedem conexão. Nomear o ruído ('isso é julgamento moralizador') já desarma 50% dele — vira metacognição."}
+                            {exercicio.type==='sinal_vs_juizo' && "Nomear sentimento real (no corpo: 'tristeza, aperto') regula amígdala (affect labeling ↓ 30%). Pseudo-sentimento ('traída, manipulada') soa como acusação e escala conflito."}
+                            {exercicio.type==='escuta_clinica' && "Conselho rouba autonomia e libera cortisol. Empatia devolve agência, libera ocitocina. Refletir sentimento+necessidade faz a pessoa se sentir vista — 80% da resolução é só isso + silêncio."}
                           </div>
-                          <div className="text-[11px] font-black tracking-widest text-zinc-500 mt-2">💡 EXEMPLO PRÁTICO EXTRA</div>
-                          <div className="text-[12px] font-bold leading-relaxed">Tente falar em voz alta a frase girafa 3x, mudando só o pedido. Seu sistema nervoso aprende pelo som da sua voz.</div>
+                          <div className="text-[11px] font-black tracking-widest text-zinc-500 mt-3 flex items-center gap-1">💡 EXEMPLO PRÁTICO EXTRA <span className="text-[10px] font-bold bg-[#E6FFE1] px-2 py-0.5 rounded-full border border-zinc-900">fale em voz alta 3x</span></div>
+                          <div className="text-[12px] font-bold leading-relaxed mt-1 bg-[#FFFBF0] p-2.5 rounded-xl border-2 border-zinc-900">Tente falar em voz alta a frase girafa 3x, mudando só o pedido: “...me avisar com 30min?”, “...combinar horário fixo?”, “...me incluir na decisão?”. Seu sistema nervoso aprende pelo som da sua voz (codificação auditivo-motora).</div>
+                          {nerd && (
+                            <div className="mt-3 p-3 rounded-2xl bg-[#F4F0FF] border-2 border-zinc-900">
+                              <div className="game font-black text-[11px] tracking-widest text-[#9A5CFF] flex items-center gap-1.5">🧬 MODO NERD — PARA A DRA. GABI <span className="ml-auto bg-[#9A5CFF] text-white px-2 py-0.5 rounded-full text-[10px]">{faseObj.code}</span></div>
+                              <div className="text-[12px] font-medium leading-relaxed text-zinc-700 mt-2">{faseObj.nerdMecanismo}</div>
+                              <div className="mt-2 text-[12px] font-bold p-2.5 rounded-xl bg-white border-2 border-zinc-900"><span className="text-[#46A302]">🏥 Na prática:</span> {faseObj.nerdClinico}</div>
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-[#FFF4CC] border-2 border-zinc-900">{faseObj.nerdBiomarcador}</span>
+                                <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-white border border-zinc-900 hidden md:inline">{faseObj.nerdRef.slice(0,62)}…</span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -899,7 +1059,15 @@ function App(){
               <div className="bg-[#1CB0F6] p-5 border-b-[3px] border-zinc-900 text-white flex gap-3 items-center">
                 <GiraMascot size={48} mood="happy"/>
                 <div><div className="game font-black text-[13px] tracking-widest">🔧 OFICINA DA GIRA</div><h2 className="game font-black text-[20px] leading-none">Crie seu Girafês real</h2></div>
+                <div className="ml-auto hidden md:flex items-center gap-2"><span className="bg-white text-[#1CB0F6] game font-black text-[10px] px-2.5 py-1 rounded-full border-2 border-zinc-900">OFNP</span>{nerd && <span className="bg-[#9A5CFF] text-white game font-black text-[10px] px-2 py-1 rounded-full border-2 border-zinc-900">🧬 NERD ON</span>}</div>
               </div>
+              {nerd && (
+                <div className="mx-5 mt-5 p-3 rounded-2xl bg-[#F4F0FF] border-[3px] border-zinc-900">
+                  <div className="game font-black text-[11px] tracking-widest text-[#9A5CFF] flex items-center gap-1">🧬 DICA NERD PRA TRIAGEM</div>
+                  <div className="text-[12px] font-bold leading-relaxed mt-1">Gabi: use a triagem como “anamnese afetiva”. 1) <b>Observação</b> = dado objetivo (como PA). 2) <b>Sentimento</b> = interocepção (ínsula). 3) <b>Necessidade</b> = hipótese fisiológica (qual homeostase?). 4) <b>Pedido</b> = prescrição SMART. Escrever ativa CPF ventrolateral e regula amígdala — journaling terapêutico ↓ cortisol (Pennebaker).</div>
+                  <div className="mt-2 flex flex-wrap gap-1.5"><span className="text-[10px] font-black bg-white border-2 border-zinc-900 px-2 py-1 rounded-full">🧪 VFC + cortisol ↓</span><span className="text-[10px] font-bold bg-white border border-zinc-900 px-2 py-1 rounded-full">Pennebaker 1997 • Lieberman labeling</span></div>
+                </div>
+              )}
               <div className="p-5 space-y-4">
                 <div className="p-4 rounded-[20px] bg-zinc-50 border-[3px] border-zinc-900">
                   <div className="game font-black text-[12px]">01 👀 O QUE ACONTECEU? (filmável)</div>
