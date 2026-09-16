@@ -205,6 +205,7 @@ function App(){
   const [flying,setFlying]=useState([]);
   const [muted,setMuted]=useState(false);
   const [daily,setDaily]=useState({date: new Date().toISOString().slice(0,10), exToday:0, triageToday:0, chestOpened:false});
+  const [mapOpen,setMapOpen]=useState(false);
   const audioRef = useRef(null);
 
   // audio helper
@@ -418,7 +419,7 @@ function App(){
       )}
 
       <main className="flex-1 max-w-[1160px] w-full mx-auto px-3 md:px-6 py-4 md:py-6 grid grid-cols-1 lg:grid-cols-[360px_1fr] gap-4 md:gap-6">
-        <aside className="lg:sticky lg:top-[78px] self-start space-y-4">
+        <aside className="lg:sticky lg:top-[78px] self-start space-y-4 order-2 lg:order-1">
           {/* Missão Diária + Baú */}
           <div className={`rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] overflow-hidden ${dailyReady?'bg-[#FFF4CC] chest-ready':'bg-white'}`}>
             <div className="p-4">
@@ -442,7 +443,10 @@ function App(){
           <div className="bg-white rounded-[24px] border-[3px] border-zinc-900 shadow-[0_6px_0_#111] overflow-hidden">
             <div className="p-4 flex items-center justify-between">
               <div className="game font-black text-[15px]">🗺️ Mapa</div>
-              <span className="game font-black text-[12px] bg-zinc-900 text-white px-2.5 py-1 rounded-full">{Object.keys(completos).length}/40</span>
+              <div className="flex items-center gap-2">
+                <span className="game font-black text-[12px] bg-zinc-900 text-white px-2.5 py-1 rounded-full">{Object.keys(completos).length}/40</span>
+                <button onClick={()=>setMapOpen(v=>!v)} className="lg:hidden w-8 h-8 rounded-xl bg-white border-2 border-zinc-900 flex items-center justify-center game font-black press">{mapOpen?'−':'+'}</button>
+              </div>
             </div>
             <div className="px-4 pb-2">
               <div className="h-3 bg-zinc-100 rounded-full border-2 border-zinc-900 overflow-hidden p-1"><div className="h-full bg-[#58CC02] rounded-full transition-all" style={{width:`${progressoGeral}%`}}></div></div>
@@ -453,7 +457,19 @@ function App(){
                 <button onClick={()=>setView('certificado')} className={`game font-black text-[12px] px-3 py-2 rounded-full border-2 press ${view==='certificado'?'bg-[#FFD900] border-zinc-900 shadow-3d-yellow':'bg-white border-zinc-200'}`}>🏆</button>
               </div>
             </div>
-            <div className="relative px-4 pb-4">
+            {!mapOpen && (
+              <div className="lg:hidden px-4 pb-3">
+                <button onClick={()=>setMapOpen(true)} className="w-full p-3 rounded-2xl bg-zinc-50 border-2 border-zinc-900 flex items-center gap-3 press">
+                  <div className="w-10 h-10 rounded-full border-2 border-zinc-900 flex items-center justify-center text-[18px]" style={{background:faseObj.color}}>{faseObj.emoji}</div>
+                  <div className="text-left flex-1 min-w-0">
+                    <div className="game font-black text-[12px] leading-none truncate">{faseObj.titulo} • {pctFase}%</div>
+                    <div className="text-[11px] font-bold text-zinc-500">Toque para ver mapa ↓</div>
+                  </div>
+                  <span>🗺️</span>
+                </button>
+              </div>
+            )}
+            <div className={`${mapOpen ? '' : 'hidden lg:block'} relative px-4 pb-4`}>
               <svg className="absolute left-1/2 -translate-x-1/2 top-0 bottom-0 w-[40px] h-full hidden md:block" viewBox="0 0 40 800" preserveAspectRatio="none"><path d="M20 0 C 40 80, 0 160, 20 240 C 40 320, 0 400, 20 480 C 40 560, 0 640, 20 720" stroke="#E4E4E7" strokeWidth="8" fill="none" strokeLinecap="round" strokeDasharray="14 14"/></svg>
               <div className="space-y-3 relative">
                 {FASES.map(f=>{
@@ -502,7 +518,16 @@ function App(){
           </div>
         </aside>
 
-        <section className="min-w-0 space-y-4">
+        <section className="min-w-0 space-y-4 order-1 lg:order-2">
+          {/* CTA sticky mobile - jogo primeiro */}
+          <div className="lg:hidden sticky top-[66px] z-20 -mx-3 px-3 py-2.5 bg-[#FFFBF0]/95 backdrop-blur border-b-[3px] border-zinc-900 flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl border-2 border-zinc-900 flex items-center justify-center shrink-0" style={{background:faseObj.color}}><span className="text-[16px]">{faseObj.emoji}</span></div>
+            <div className="flex-1 min-w-0">
+              <div className="game font-black text-[12px] leading-none truncate">{faseObj.titulo}</div>
+              <div className="h-1.5 bg-zinc-100 rounded-full border border-zinc-900 overflow-hidden mt-1"><div className="h-full rounded-full transition-all" style={{width:`${pctFase}%`, background:faseObj.color}}></div></div>
+            </div>
+            <button onClick={()=>openFase(faseAtiva)} className="shrink-0 px-4 py-2 rounded-full game font-black text-white border-b-[3px] press text-[12px]" style={{background:faseObj.color, borderColor:faseObj.dark}}>▶ JOGAR</button>
+          </div>
           {view==='map' && (
             <div className="space-y-4">
               <div className="bg-white rounded-[28px] border-[3px] border-zinc-900 shadow-[0_8px_0_#111] overflow-hidden">
